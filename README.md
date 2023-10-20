@@ -2,6 +2,10 @@
 
 Provides a UI for viewing, creating and editing groups in BCC
 
+## Overview
+
+The application is build with the BFF pattern where the server is used as an authentication layer maintainig a cookie session with the browser, 
+and taking care of authenticating and forwarding api requests to the Core API
 
 ## Running application
 
