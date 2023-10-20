@@ -17,6 +17,10 @@ terraform {
   }
 }
 
+locals {
+  props = merge(jsondecode(var.props), jsondecode(var.deployment_props))
+}
+
 
 provider "google" {
   region          = local.props.gcp.location
