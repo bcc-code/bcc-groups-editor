@@ -1,0 +1,20 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Compose up",
+            "command": "./scripts/compose-up.sh",
+            "problemMatcher": []
+        },
+        {
+            "label": "Start dev server",
+            "command": "./scripts/start-dev-server.sh",
+            "problemMatcher": []
+        },
+        {
+            "label": "Start dev frontend",
+            "command": "./scripts/start-dev-frontend.sh",
+            "problemMatcher": []
+        }
+    ]
+}
