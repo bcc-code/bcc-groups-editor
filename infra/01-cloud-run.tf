@@ -37,15 +37,15 @@ resource "google_cloud_run_v2_service" "main" {
       }
       env {
         name  = "SERVER_HOST"
-        value = var.oauth_issuer
+        value = var.server_host
       }
       env {
         name  = "COREAPI_BASE_PATH"
-        value = var.oauth_issuer
+        value = var.coreapi_basepath
       }
       env {
         name  = "COREAPI_AUDIENCE"
-        value = var.oauth_issuer
+        value = var.coreapi_audience
       }
 
     }
