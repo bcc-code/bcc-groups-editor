@@ -1,0 +1,44 @@
+name: Deploy prod
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  SERVICE_NAME: groups-editor
+
+jobs:
+  build:
+    name: Build and publish image
+    runs-on: ubuntu-latest
+    environment: prod
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Build and publish
+        uses: ./.github/actions/build-and-publish-image
+        with:
+          projectId: ${{ vars.GOOGLE_PROJECT_ID }}
+          googleCredentials: ${{ secrets.GOOGLE_CREDENTIALS }}
+          imageName: ${{env.SERVICE_NAME}}
+          registryBaseUrl: ${{vars.REGISTRY_BASE_URL}}
+          registryName: ${{vars.REGISTRY_NAME}}
+  deploy:
+    needs: [build]
+    name: Deploy image to cloud run
+    runs-on: ubuntu-latest
+    environment: prod
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Deploy
+        uses: ./.github/actions/deploy-cloud-run-app
+        with:
+          projectId: ${{vars.GOOGLE_PROJECT_ID}}
+          imageName: ${{env.SERVICE_NAME}}
+          googleCredentials: ${{ secrets.GOOGLE_CREDENTIALS }}
+          registryBaseUrl: ${{vars.REGISTRY_BASE_URL}}
+          registryName: ${{vars.REGISTRY_NAME}}
+          serviceName: ${{env.SERVICE_NAME}}
+          serviceRegion: ${{vars.REGION}}
