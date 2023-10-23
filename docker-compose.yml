@@ -1,0 +1,21 @@
+version: "3.4"
+
+services:
+  server:
+    build:
+      context: .
+      dockerfile: ./server/dev.Dockerfile
+    ports:
+      - "4120:4120"
+    volumes:
+      - ./server:/app/server
+    env_file: .env
+    environment:
+      PORT: 4120
+      FRONTEND_LOCATION: http://frontend:5173
+  frontend:
+    build:
+      context: frontend
+      dockerfile: dev.Dockerfile
+    volumes:
+      - ./frontend/src:/app/src
