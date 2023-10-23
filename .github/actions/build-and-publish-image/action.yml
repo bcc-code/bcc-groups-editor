@@ -7,10 +7,10 @@ inputs:
     required: true
   buildContext:
     description: "Path to the directory containing the applications build context"
-    required: true
+    default: .
   dockerfilePath:
     description: "Path to the Dockerfile for the application"
-    required: true
+    default: Dockerfile
   imageName:
     description: "Name of the image created in the artifact registry"
     required: true

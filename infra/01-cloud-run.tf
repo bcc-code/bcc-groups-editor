@@ -1,15 +1,15 @@
-resource "random_uuid" "auth0_pages_revision_id" {
+resource "random_uuid" "main_revision_id" {
   keepers = {
     first = timestamp()
   }
 }
 
-resource "google_cloud_run_v2_service" "auth0_pages" {
-  name     = "auth0-pages"
+resource "google_cloud_run_v2_service" "main" {
+  name     = "grous-editor"
   location = local.props.gcp.location
   ingress  = "INGRESS_TRAFFIC_ALL"
   template {
-    revision = "auth0-pages-${random_uuid.auth0_pages_revision_id.result}"
+    revision = "grous-editor-${random_uuid.main_revision_id.result}"
 
     scaling {
       max_instance_count = 10
@@ -79,9 +79,9 @@ data "google_iam_policy" "noauth" {
 }
 
 resource "google_cloud_run_service_iam_policy" "noauth-coreapi" {
-  location = google_cloud_run_v2_service.auth0_pages.location
-  project  = google_cloud_run_v2_service.auth0_pages.project
-  service  = google_cloud_run_v2_service.auth0_pages.name
+  location = google_cloud_run_v2_service.main.location
+  project  = google_cloud_run_v2_service.main.project
+  service  = google_cloud_run_v2_service.main.name
 
   policy_data = data.google_iam_policy.noauth.policy_data
 }

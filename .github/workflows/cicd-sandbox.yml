@@ -21,8 +21,6 @@ jobs:
         with:
           projectId: ${{ vars.GOOGLE_PROJECT_ID }}
           googleCredentials: ${{ secrets.GOOGLE_CREDENTIALS }}
-          buildContext: auth0-pages
-          dockerfilePath: auth0-pages/Dockerfile
           imageName: ${{env.SERVICE_NAME}}
           registryBaseUrl: ${{vars.REGISTRY_BASE_URL}}
           registryName: ${{vars.REGISTRY_NAME}}
