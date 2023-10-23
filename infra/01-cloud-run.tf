@@ -5,11 +5,11 @@ resource "random_uuid" "main_revision_id" {
 }
 
 resource "google_cloud_run_v2_service" "main" {
-  name     = "grous-editor"
+  name     = "groups-editor"
   location = local.props.gcp.location
   ingress  = "INGRESS_TRAFFIC_ALL"
   template {
-    revision = "grous-editor-${random_uuid.main_revision_id.result}"
+    revision = "groups-editor-${random_uuid.main_revision_id.result}"
 
     scaling {
       max_instance_count = 10
