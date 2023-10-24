@@ -12,6 +12,10 @@ jobs:
     runs-on: ubuntu-latest
     environment: sandbox
 
+    permissions:
+      contents: "read"
+      id-token: "write"
+
     steps:
       - uses: actions/checkout@v3
 
@@ -28,7 +32,9 @@ jobs:
         name: "Authenticate to Google Cloud"
         uses: "google-github-actions/auth@v1"
         with:
-          credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}
+          workload_identity_provider: ${{ vars.GCP_WIDPP_ID_PROD }} #Global
+          service_account: "sa-gha-cicd@${{ vars.GOOGLE_PROJECT_ID }}.iam.gserviceaccount.com"
+          project_id: ${{ vars.GOOGLE_PROJECT_ID }}
 
       - id: "upload-folder"
         name: "Upload Files to Google Storage"

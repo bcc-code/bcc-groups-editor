@@ -3,4 +3,4 @@ import groupEditVue from "./components/group-editor.ce.vue";
 
 export const GroupEdit = defineCustomElement(groupEditVue);
 
-customElements.define("group-editor", GroupEdit);
+customElements.define("bcc-group-editor", GroupEdit);
