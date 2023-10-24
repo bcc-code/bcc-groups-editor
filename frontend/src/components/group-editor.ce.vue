@@ -7,19 +7,31 @@
 import groupsView from './groups-view.vue';
 import groupEdit from './group-edit.vue';
 import {Group} from '../types'
-import { ref } from 'vue';
-import { Api, getEmptyGroup } from '../api';
+import {  ref } from 'vue';
+import { Api, TokenSource, StaticTokenSource, UrlTokenSource, getEmptyGroup } from '../api';
 
 const props = defineProps({
-    apiBaseUrl: {type: String, required: true}
+    apiBaseUrl: {type: String, required: true},
+    accessToken: {type: String, default: ''},
+    accessTokenEndpoint: {type: String, default: ''},
 })
 
-const api = new Api(props.apiBaseUrl)
+const api = createApi()
+
+function createApi(): Api {
+    let tokenSource: TokenSource | undefined;
+    if(props.accessToken) 
+        tokenSource = new StaticTokenSource(props.accessToken)
+
+    else if(props.accessTokenEndpoint) 
+        tokenSource = new UrlTokenSource(props.accessTokenEndpoint)
+
+    return new Api(props.apiBaseUrl, tokenSource)
+
+}
 
 
 const editedGroup = ref<Group | null>(null)
-
-
 </script>
 
 <style>
