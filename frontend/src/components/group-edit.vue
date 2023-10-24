@@ -1,7 +1,20 @@
 <template>
+    <BccAlert
+        title="Error saving group!"
+        icon
+        closeButton
+        context="danger"
+        :open="errorSaving != ''"
+        @close="errorSaving = ''"
+        >
+        {{errorSaving}}
+        </BccAlert>
     <div class="flex justify-between mb-4">
         <BccButton variant="tertiary" :padding="false" @click="$emit('close')">Back</BccButton>
-        <BccButton @click="save" :disabled="!isChanged">Save</BccButton>
+        <div class="flex gap-4">
+            <BccButton v-if="group.uid" context="danger" @click="deleteGroup">Delete</BccButton>
+            <BccButton :disabled="group.uid != '' && !isChanged" @click="saveGroup">Save</BccButton>
+        </div>
     </div>
     <div class="grid grid-cols-1 gap-4">
         <BccInput disabled v-model="editedGroup.uid" label="Uid"/>
@@ -31,7 +44,7 @@
 </template>
 
 <script setup lang="ts">
-import { BccButton, BccInput, BccSelect } from '@bcc-code/design-library-vue';
+import { BccAlert, BccButton, BccInput, BccSelect } from '@bcc-code/design-library-vue';
 import { AddIcon, DeleteIcon } from '@bcc-code/icons-vue';
 import { PropType, computed, ref } from 'vue';
 
@@ -49,11 +62,32 @@ const isChanged = computed(() => {
     return JSON.stringify(props.group) != JSON.stringify(editedGroup.value)
 })
 
+const errorSaving = ref("")
 
-async function save() {
-    await props.api.saveGroup(editedGroup.value)
-    emit('close')
+async function saveGroup() {
+    try {
+
+        await props.api.saveGroup(editedGroup.value)
+        emit('close')
+    } catch(err) {
+        if(!(err instanceof Error))
+            throw err
+        errorSaving.value = err.message 
+    }
 }
+
+
+async function deleteGroup() {
+    try {
+        await props.api.deleteGroup(props.group.uid)
+        emit('close')
+    } catch(err) {
+        if(!(err instanceof Error))
+            throw err
+        errorSaving.value = err.message 
+    }
+}
+
 
 const emit = defineEmits(['close'])
 

@@ -8,7 +8,7 @@ import groupsView from './groups-view.vue';
 import groupEdit from './group-edit.vue';
 import {Group} from '../types'
 import { ref } from 'vue';
-import { Api } from '../api';
+import { Api, getEmptyGroup } from '../api';
 
 const props = defineProps({
     apiBaseUrl: {type: String, required: true}
@@ -18,18 +18,6 @@ const api = new Api(props.apiBaseUrl)
 
 
 const editedGroup = ref<Group | null>(null)
-
-function getEmptyGroup(): Group {
-    return {
-        uid: "",
-        name: "",
-        rule: "",
-        tags: [],
-        type: "Static",
-        appUid: "",
-        lastChangedDate: "",
-    }
-}
 
 
 </script>
