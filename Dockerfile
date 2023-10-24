@@ -3,7 +3,7 @@ FROM node:18-buster as build-frontend
 WORKDIR /app
 COPY frontend .
 
-RUN npm ci
+RUN npm ci --force
 RUN npm run build
 
 FROM golang:1.21-bullseye as build-server
