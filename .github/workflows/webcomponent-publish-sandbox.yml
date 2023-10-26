@@ -1,0 +1,44 @@
+name: Deploy Web Component Sandbox
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - frontend/**
+  workflow_dispatch:
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    environment: sandbox
+
+    permissions:
+      contents: "read"
+      id-token: "write"
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        name: Build Widgets
+        with:
+          node-version: "16.x"
+      - run: |
+          cd ui
+          npm ci --force
+          npm run build
+
+      - id: "auth"
+        name: "Authenticate to Google Cloud"
+        uses: "google-github-actions/auth@v1"
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIDPP_ID_PROD }} #Global
+          service_account: "sa-gha-cicd@${{ vars.GOOGLE_PROJECT_ID }}.iam.gserviceaccount.com"
+          project_id: ${{ vars.GOOGLE_PROJECT_ID }}
+
+      - id: "upload-folder"
+        name: "Upload Files to Google Storage"
+        uses: "google-github-actions/upload-cloud-storage@v1"
+        with:
+          path: "./frontend/dist/index.js"
+          destination: "sb-${{ vars.GOOGLE_PROJECT_ID }}-webcomponent"
