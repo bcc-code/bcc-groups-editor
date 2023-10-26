@@ -42,3 +42,4 @@ jobs:
         with:
           path: "./frontend/dist/index.js"
           destination: "sb-${{ vars.GOOGLE_PROJECT_ID }}-webcomponent"
+          project_id: ${{ vars.GOOGLE_PROJECT_ID }}
