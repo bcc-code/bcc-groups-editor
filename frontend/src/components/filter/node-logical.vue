@@ -1,8 +1,8 @@
 <template>
-    <div class="py-4 pl-4 roudned bg-black bg-opacity-5">
+    <div class="py-4 pl-4 rounded bg-black bg-opacity-5">
         <div class="flex items-center gap-2">
             <BccButton size="xs" :variant="'tertiary'" @click="swapOperator">{{ model.operator.toUpperCase() }}</BccButton>
-            <BccButton size="xs" :icon="AddIcon"></BccButton>
+            <NodeAdd :schema="schema"/>
             <BccButton size="xs" context="danger" :icon="RemoveIcon" @click="emit('remove')"></BccButton>
         </div>
         {{ modelValue }}
@@ -19,6 +19,7 @@ import {FilterNodeLogical, FilterSchema} from '../../types'
 import { BccButton } from '@bcc-code/design-library-vue';
 import { AddIcon, RemoveIcon } from '@bcc-code/icons-vue';
 import Node from './node.vue';
+import NodeAdd from './node-add.vue';
 
 const props = defineProps({
     modelValue: {
