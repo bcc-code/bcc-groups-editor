@@ -1,12 +1,14 @@
 <template>
     <NodeLogical v-if="model.type == 'logical'" :schema="schema" v-model="model"/>
+    <NodeField v-else-if="model.type == 'field'" :schema="schema" v-model="model"/>
     <div v-else>unsupported</div>
 </template>
 
 <script setup lang="ts">
 import { PropType, computed } from 'vue';
-import { FilterNode, FilterSchema } from '../../types';
+import { FilterNode, Schema } from '../../types';
 import NodeLogical from './node-logical.vue';
+import NodeField from './node-field.vue';
 
 const props = defineProps({
     modelValue: {
@@ -14,7 +16,7 @@ const props = defineProps({
         required: true
     },
     schema: {
-        type: Object as PropType<FilterSchema>,
+        type: Object as PropType<Schema>,
         required: true
     }
 })

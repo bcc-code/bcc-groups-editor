@@ -16,24 +16,24 @@ export type Direction = "ascending" | "descending";
 export type FilterRelationType = "some" | "none";
 
 export type FilterOperator =
-  | "eq"
-  | "neq"
-  | "lt"
-  | "lte"
-  | "gt"
-  | "gte"
-  | "in"
-  | "nin"
-  | "null"
-  | "nnull"
-  | "contains"
-  | "ncontains";
+  | "_eq"
+  | "_neq"
+  | "_lt"
+  | "_lte"
+  | "_gt"
+  | "_gte"
+  | "_in"
+  | "_nin"
+  | "_null"
+  | "_nnull"
+  | "_contains"
+  | "_ncontains";
 export type ClientFilterOperator =
   | FilterOperator
-  | "starts_with"
-  | "nstarts_with"
-  | "ends_with"
-  | "nends_with";
+  | "_starts_with"
+  | "_nstarts_with"
+  | "_ends_with"
+  | "_nends_with";
 export type FilterContext = Record<string, any>;
 export type Filter<T = FilterContext> =
   | LogicalFilter<Partial<T>>
@@ -104,3 +104,15 @@ export type FilterNodeRelationalOne = {
 };
 
 export type FilterSchema = {};
+
+export type Schema = Record<string, SchemaField>;
+
+export type SchemaType = "string" | "integer" | "float" | "date" | "date-time";
+
+export type SchemaField = SchemaType | SchemaFieldOpts;
+
+export type SchemaFieldOpts = {
+  name?: string;
+  type: SchemaType;
+  choices?: string[];
+};

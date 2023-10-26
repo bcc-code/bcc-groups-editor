@@ -1,13 +1,12 @@
 
 <template>
-    <BccInput v-model="model"/>
-    <Node v-if="baseNode" v-bind="{schema}" v-model="baseNode" />
+    {{ JSON.stringify(model) }}
+    <Node v-bind="{schema}" v-model="model" />
 </template>
 
 <script setup lang="ts">
-import {BccInput} from '@bcc-code/design-library-vue'
-import { PropType, computed, ref } from 'vue';
-import { FilterNode, FilterSchema } from '../../types'
+import { PropType, computed } from 'vue';
+import { FilterNode, Schema } from '../../types'
 import Node from './node.vue';
 
 const props = defineProps({
@@ -16,34 +15,39 @@ const props = defineProps({
         required: true
     },
     schema: {
-        type: Object as PropType<FilterSchema>,
+        type: Object as PropType<Schema>,
         required: true
     }
 })
 
-const baseNode = ref<FilterNode>({
-    type: 'logical',
-    operator: 'or',
-    nodes: [{
-        type: 'logical',
-        operator: 'or',
-        nodes: []
-    }, {
-        type: 'logical',
-        operator: 'or',
-        nodes: []
-    }]
-})
 
 const emits = defineEmits(['update:modelValue'])
 
 const model = computed({
     get() {
-        return props.modelValue
+        return getNodesFromFilter( props.modelValue)
     },
-    set(v: string) {
-        emits('update:modelValue', v)
+    set(v: FilterNode) {
+        emits('update:modelValue', getFilterFromNode(v))
     }
 })
+
+function getNodesFromFilter(f: string): FilterNode {
+    console.log(f)
+    return {
+        type: 'logical',
+        operator: 'or',
+        nodes: [{
+            type: 'field',
+            field: 'name',
+            operator: '_eq',
+            value: 'Test'
+        }]
+    }
+}
+
+function getFilterFromNode(n: FilterNode): string {
+    return JSON.stringify(n)
+}
 
 </script>

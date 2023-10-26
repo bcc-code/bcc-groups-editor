@@ -1,34 +1,48 @@
 <template>
-    {{ selected }}
+    <!-- {{ selected }} -->
     <select class="add-node-select" value="" @input="add">
-        <option>Or</option>
-        <option>Name</option>
+        <option value="logical">And/Or group</option>
+        <FieldOptions :schema="schema"/>
     </select>
 </template>
 
 <script setup lang="ts">
-import { PropType, ref } from 'vue';
-import { FilterSchema } from '../../types';
+import { PropType } from 'vue';
+import { FilterNode, Schema } from '../../types';
+import FieldOptions from './field-options.vue';
 
-
-const props = defineProps({
+defineProps({
     schema: {
-        type: Object as PropType<FilterSchema>,
+        type: Object as PropType<Schema>,
         required: true
     }
 })
 
 function add(e: Event) {
-    if(!e.target) return
-   
-    selected.value.push(e.target.value)
+    if(!(e.target instanceof HTMLSelectElement)) return
 
-    e.target.value = null
+    if(e.target.value == 'logical') {
+        emit('addNode', {
+            type: 'logical',
+            operator: 'and',
+            nodes: []
+        } )
+    }
+    else {
+        emit('addNode', {
+            type: 'field',
+            field: e.target.value,
+            operator: '_eq',
+            value: undefined
+        })
+    }
 
+    e.target.value = ""
 }
 
-const selected = ref<any>([])
-
+const emit = defineEmits<{
+    addNode: [FilterNode]
+}>()
 
 </script>
 

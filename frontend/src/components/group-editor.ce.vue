@@ -9,7 +9,7 @@
 import groupsView from './groups-view.vue';
 import groupEdit from './group-edit.vue';
 import {Group} from '../types'
-import {  ref,  watchEffect } from 'vue';
+import { ref, watchEffect } from 'vue';
 import { Api, TokenSource, StaticTokenSource, UrlTokenSource, getEmptyGroup } from '../api';
 
 const props = defineProps({

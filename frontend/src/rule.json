@@ -7,22 +7,8 @@
     "gender": {
         "type": "string",
         "choices": [
-            {
-                "text": "Male",
-                "value": "male"
-            },
-            {
-                "text": "Female",
-                "value": "female"
-            }
+            "Male",
+            "Female"
         ]
-    },
-    "country": {
-        "type": "string",
-        "choices": "$COUNTRIES"
-    },
-    "meta": {
-        "now": "dateTime",
-        "active": "boolean"
     }
 }
