@@ -12,6 +12,7 @@
     "@bcc-code/design-library-vue": "^2.0.0-beta.2",
     "@bcc-code/icons": "^1.4.0",
     "@bcc-code/icons-vue": "^1.4.0",
+    "lodash-es": "^4.17.21",
     "vue": "^3.3.4"
   },
   "devDependencies": {

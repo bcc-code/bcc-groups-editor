@@ -1,0 +1,28 @@
+{
+    "name": {
+        "name": "Full name",
+        "type": "string"
+    },
+    "age": "integer",
+    "gender": {
+        "type": "string",
+        "choices": [
+            {
+                "text": "Male",
+                "value": "male"
+            },
+            {
+                "text": "Female",
+                "value": "female"
+            }
+        ]
+    },
+    "country": {
+        "type": "string",
+        "choices": "$COUNTRIES"
+    },
+    "meta": {
+        "now": "dateTime",
+        "active": "boolean"
+    }
+}

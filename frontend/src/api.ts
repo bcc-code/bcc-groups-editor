@@ -121,7 +121,7 @@ export function getEmptyGroup(): Group {
     name: "",
     rule: "",
     tags: [],
-    type: "Static",
+    type: "Dynamic",
     appUid: "",
     lastChangedDate: "",
   };

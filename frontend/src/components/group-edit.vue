@@ -23,7 +23,11 @@
             <option>Static</option>
             <option>Dynamic</option>
         </BccSelect>
-        <BccInput v-if="editedGroup.type == 'Dynamic'" v-model="editedGroup.rule" label="Rule"/>
+
+        <div class="w-full">
+            <label class="bcc-form-label mb-2">Rule</label>
+            <RuleInput v-if="editedGroup.type == 'Dynamic'"  v-model="editedGroup.rule" :schema="{}"/>
+        </div>
 
         <BccInput v-model="editedGroup.orgUid" label="Org Uid"/>
         <div class="w-full">
@@ -45,6 +49,7 @@
 
 <script setup lang="ts">
 import { BccAlert, BccButton, BccInput, BccSelect } from '@bcc-code/design-library-vue';
+import RuleInput from './filter/interface.vue'
 import { AddIcon, DeleteIcon } from '@bcc-code/icons-vue';
 import { PropType, computed, ref } from 'vue';
 

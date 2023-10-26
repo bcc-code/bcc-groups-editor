@@ -36,7 +36,7 @@ function createApi(): Api {
 
 }
 
-const editedGroup = ref<Group | null>(null)
+const editedGroup = ref<Group | null>(getEmptyGroup())
 </script>
 
 <style>
