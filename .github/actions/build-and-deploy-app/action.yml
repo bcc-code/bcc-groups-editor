@@ -26,7 +26,9 @@ inputs:
   serviceRegion:
     description: "Region of the cloud run"
     required: true
-
+  serviceName:
+    description: "Name of the cloud run service"
+    required: true
 runs:
   using: "composite"
   steps:

@@ -30,3 +30,4 @@ jobs:
           registryBaseUrl: ${{vars.REGISTRY_BASE_URL}}
           registryName: ${{vars.REGISTRY_NAME}}
           serviceRegion: ${{vars.REGION}}
+          serviceName: ${{env.SERVICE_NAME}}
