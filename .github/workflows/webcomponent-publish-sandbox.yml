@@ -32,7 +32,7 @@ jobs:
         name: "Authenticate to Google Cloud"
         uses: "google-github-actions/auth@v1"
         with:
-          workload_identity_provider: ${{ vars.GCP_WIDPP_ID_PROD }} #Global
+          workload_identity_provider: ${{ vars.GCP_WIDPP_ID_DEV }} #Global
           service_account: "sa-gha-cicd@${{ vars.GOOGLE_PROJECT_ID }}.iam.gserviceaccount.com"
           project_id: ${{ vars.GOOGLE_PROJECT_ID }}
 
