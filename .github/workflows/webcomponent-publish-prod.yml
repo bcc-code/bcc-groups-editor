@@ -23,8 +23,9 @@ jobs:
         name: Build Widgets
         with:
           node-version: "16.x"
-      - run: |
-          cd ui
+      - name: "Build web component"
+        run: |
+          cd frontend
           npm ci --force
           npm run build
 
@@ -35,6 +36,7 @@ jobs:
           workload_identity_provider: ${{ vars.GCP_WIDPP_ID_PROD }} #Global
           service_account: "sa-gha-cicd@${{ vars.GOOGLE_PROJECT_ID }}.iam.gserviceaccount.com"
           project_id: ${{ vars.GOOGLE_PROJECT_ID }}
+
       - id: "upload-folder"
         name: "Upload Files to Google Storage"
         uses: "google-github-actions/upload-cloud-storage@v1"

@@ -20,11 +20,11 @@ jobs:
       - uses: actions/checkout@v3
 
       - uses: actions/setup-node@v3
-        name: Build Widgets
         with:
           node-version: "16.x"
-      - run: |
-          cd ui
+      - name: "Build web component"
+        run: |
+          cd frontend
           npm ci --force
           npm run build
 
@@ -32,7 +32,7 @@ jobs:
         name: "Authenticate to Google Cloud"
         uses: "google-github-actions/auth@v1"
         with:
-          workload_identity_provider: ${{ vars.GCP_WIDPP_ID_PROD }} #Global
+          workload_identity_provider: ${{ vars.GCP_WIDPP_ID_DEV }} #Global
           service_account: "sa-gha-cicd@${{ vars.GOOGLE_PROJECT_ID }}.iam.gserviceaccount.com"
           project_id: ${{ vars.GOOGLE_PROJECT_ID }}
 
@@ -42,3 +42,4 @@ jobs:
         with:
           path: "./frontend/dist/index.js"
           destination: "sb-${{ vars.GOOGLE_PROJECT_ID }}-webcomponent"
+          project_id: ${{ vars.GOOGLE_PROJECT_ID }}
