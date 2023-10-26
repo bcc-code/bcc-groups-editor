@@ -29,3 +29,4 @@ jobs:
           imageName: ${{env.SERVICE_NAME}}
           registryBaseUrl: ${{vars.REGISTRY_BASE_URL}}
           registryName: ${{vars.REGISTRY_NAME}}
+          serviceRegion: ${{vars.REGION}}

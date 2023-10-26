@@ -23,6 +23,9 @@ inputs:
   registryName:
     description: "Name of the artifact registry"
     required: true
+  serviceRegion:
+    description: "Region of the cloud run"
+    required: true
 
 runs:
   using: "composite"
