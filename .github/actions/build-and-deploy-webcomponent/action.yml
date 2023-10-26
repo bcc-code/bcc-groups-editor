@@ -21,7 +21,7 @@ runs:
       shell: bash
       run: |
         cd frontend
-        npm ci --force
+        npm ci
         npm run build
 
     - id: "auth"

@@ -1,5 +1,5 @@
 #! /bin/bash
 
 cd frontend
-npm i --force
+npm i
 npm run dev
