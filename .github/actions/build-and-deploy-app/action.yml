@@ -1,0 +1,60 @@
+name: Build and deploy cloud run application
+description: "Build and push to container registry"
+
+inputs:
+  projectId:
+    description: "Google project ID"
+    required: true
+  buildContext:
+    description: "Path to the directory containing the applications build context"
+    default: .
+  dockerfilePath:
+    description: "Path to the Dockerfile for the application"
+    default: Dockerfile
+  imageName:
+    description: "Name of the image created in the artifact registry"
+    required: true
+  identityFederation:
+    description: "Google identity federation id"
+    required: true
+  registryBaseUrl:
+    description: "Base URL of the artifact registry"
+    required: true
+  registryName:
+    description: "Name of the artifact registry"
+    required: true
+  serviceRegion:
+    description: "Region of the cloud run"
+    required: true
+  serviceName:
+    description: "Name of the cloud run service"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - id: "auth"
+      uses: "google-github-actions/auth@v0"
+      with:
+        workload_identity_provider: ${{ inputs.identityFederation }}
+        service_account: "sa-gha-cicd@${{ inputs.projectId }}.iam.gserviceaccount.com"
+        project_id: ${{ inputs.projectId }}
+
+    - name: Login to the artifact registry
+      shell: bash
+      run: |-
+        gcloud --quiet auth configure-docker ${{ inputs.registryBaseUrl }}
+
+    - name: Build and push container image to registry
+      uses: docker/build-push-action@v2
+      with:
+        push: true
+        tags: ${{ inputs.registryBaseUrl }}/${{ inputs.projectId}}/${{inputs.registryName}}/${{ inputs.imageName }}:${{ github.sha }}
+        context: ${{ inputs.buildContext }}
+        file: ${{ inputs.dockerfilePath }}
+
+    - id: deploy
+      uses: google-github-actions/deploy-cloudrun@v0
+      with:
+        service: ${{ inputs.serviceName }}
+        image: ${{ inputs.registryBaseUrl }}/${{ inputs.projectId}}/${{inputs.registryName}}/${{ inputs.imageName }}:${{ github.sha }}
+        region: ${{ inputs.serviceRegion }}

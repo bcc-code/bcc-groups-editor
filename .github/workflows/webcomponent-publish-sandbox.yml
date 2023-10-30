@@ -1,0 +1,26 @@
+name: Deploy Web Component Sandbox
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - frontend/**
+  workflow_dispatch:
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    environment: sandbox
+
+    permissions:
+      contents: "read"
+      id-token: "write"
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build and publish
+        uses: ./.github/actions/build-and-deploy-webcomponent
+        with:
+          projectId: ${{ vars.GOOGLE_PROJECT_ID }}
+          identityFederation: ${{ vars.GCP_WIDPP_ID_DEV }}

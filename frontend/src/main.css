@@ -1,0 +1,9 @@
+@import "@bcc-code/design-library-vue/tailwind/index.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    @apply m-4;
+}

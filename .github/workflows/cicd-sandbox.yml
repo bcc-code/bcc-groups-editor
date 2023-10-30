@@ -1,0 +1,33 @@
+name: Deploy sandbox
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  SERVICE_NAME: groups-editor
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    environment: sandbox
+
+    permissions:
+      contents: "read"
+      id-token: "write"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Build and publish
+        uses: ./.github/actions/build-and-deploy-app
+        with:
+          projectId: ${{ vars.GOOGLE_PROJECT_ID }}
+          identityFederation: ${{ vars.GCP_WIDPP_ID_DEV }}
+          imageName: ${{env.SERVICE_NAME}}
+          registryBaseUrl: ${{vars.REGISTRY_BASE_URL}}
+          registryName: ${{vars.REGISTRY_NAME}}
+          serviceRegion: ${{vars.REGION}}
+          serviceName: ${{env.SERVICE_NAME}}

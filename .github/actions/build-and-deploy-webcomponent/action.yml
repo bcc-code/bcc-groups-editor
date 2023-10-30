@@ -1,0 +1,40 @@
+name: Build and deploy web component
+description: Build and deploy web component
+
+inputs:
+  projectId:
+    description: "Google project ID"
+    required: true
+  identityFederation:
+    description: "Google identity federation id"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-node@v3
+      name: Build Widgets
+      with:
+        node-version: "16.x"
+
+    - name: "Build web component"
+      shell: bash
+      run: |
+        cd frontend
+        npm ci --force
+        npm run build
+
+    - id: "auth"
+      name: "Authenticate to Google Cloud"
+      uses: "google-github-actions/auth@v1"
+      with:
+        workload_identity_provider: ${{ inputs.identityFederation }}
+        service_account: "sa-gha-cicd@${{ inputs.projectId }}.iam.gserviceaccount.com"
+        project_id: ${{ inputs.projectId }}
+
+    - id: "upload-folder"
+      name: "Upload Files to Google Storage"
+      uses: "google-github-actions/upload-cloud-storage@v1"
+      with:
+        path: "./frontend/dist/index.js"
+        destination: "sb-${{ inputs.projectId }}-webcomponent"
