@@ -1,15 +1,26 @@
 <template>
-    <!-- {{ selected }} -->
-    <select class="add-node-select" value="" @input="add">
+    <!-- <VueMultiselect
+      v-model="val"
+      :options="['Banana', 'Apple', 'gg']">
+    </VueMultiselect> -->
+    <Dropdown v-slot="{close}">
+        <div class="hover:bg-slate-200 cursor-pointer" @click="console.log(key); close()" v-for="key of Object.keys(schema)">{{key}}</div>
+    </Dropdown>
+    <!-- <BccSelect size="sm" :key="key" modelValue="" @update:model-value="add" placeholder="Add filter">
+        <option value="" disabled>Add a filter</option>
         <option value="logical">And/Or group</option>
         <FieldOptions :schema="schema"/>
-    </select>
+    </BccSelect> -->
 </template>
 
 <script setup lang="ts">
-import { PropType } from 'vue';
+// import VueMultiselect from 'vue-multiselect'
+
+import { PropType, ref } from 'vue';
 import { FilterNode, Schema } from '../../types';
-import FieldOptions from './field-options.vue';
+// import FieldOptions from './field-options.vue';
+// import { BccSelect } from '@bcc-code/design-library-vue';
+import Dropdown from '../dropdown.vue';
 
 defineProps({
     schema: {
@@ -18,39 +29,31 @@ defineProps({
     }
 })
 
-function add(e: Event) {
-    if(!(e.target instanceof HTMLSelectElement)) return
+// const val = ref("")
 
-    if(e.target.value == 'logical') {
-        emit('addNode', {
-            type: 'logical',
-            operator: 'and',
-            nodes: []
-        } )
-    }
-    else {
-        emit('addNode', {
-            type: 'field',
-            field: e.target.value,
-            operator: '_eq',
-            value: undefined
-        })
-    }
+// function add(v: string) {
+//     // if(!(e.target instanceof HTMLSelectElement)) return
 
-    e.target.value = ""
-}
+//     if(v == 'logical') {
+//         emit('addNode', {
+//             type: 'logical',
+//             operator: 'and',
+//             nodes: []
+//         } )
+//     }
+//     else {
+//         emit('addNode', {
+//             type: 'field',
+//             field: v,
+//             operator: '_eq',
+//             value: null
+//         })
+//     }
+//     key.value++
+// }
 
 const emit = defineEmits<{
     addNode: [FilterNode]
 }>()
 
 </script>
-
-<style>
-.add-node-select {
-    @apply bg-primary;
-    @apply rounded w-5;
-    /* padding: 16px; */
-}
-
-</style>

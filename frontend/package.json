@@ -12,8 +12,12 @@
     "@bcc-code/design-library-vue": "^2.0.0-beta.2",
     "@bcc-code/icons": "^1.4.0",
     "@bcc-code/icons-vue": "^1.4.0",
+    "click-outside-vue3": "^4.0.1",
     "lodash-es": "^4.17.21",
-    "vue": "^3.3.4"
+    "v-click-outside": "^3.2.0",
+    "vue": "^3.3.4",
+    "vue-multiselect": "^3.0.0-beta.3",
+    "vue3-click-away": "^1.2.4"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.2.3",

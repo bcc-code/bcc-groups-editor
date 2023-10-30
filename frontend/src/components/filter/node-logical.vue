@@ -1,21 +1,25 @@
 <template>
-    <div class="py-4 pl-4 rounded bg-black bg-opacity-5">
-        <div class="flex items-center gap-2 pb-2">
-            <BccButton size="xs" :variant="'tertiary'" @click="swapOperator">{{ model.operator.toUpperCase() }}</BccButton>
-            <NodeAdd :schema="schema" @add-node="model.nodes.push($event)"/>
-            <BccButton size="xs" context="danger" :icon="RemoveIcon" @click="emit('remove')"></BccButton>
+    <div class="py-1 pl-1 rounded bg-black bg-opacity-5">
+        <div class="flex items-center gap-2 pb-1">
+            <BccSelect size="sm" class="w-20" v-model="operator">
+                <option value="and">And</option>
+                <option value="or">Or</option>
+            </BccSelect>
+            <!-- <BccButton size="xs" :variant="'tertiary'" @click="swapOperator">{{ modelValue.operator.toUpperCase() }}</BccButton> -->
+            <NodeAdd :schema="schema" @add-node="addNode($event)"/>
+            <BccButton size="xs" context="danger" variant="tertiary" :icon="CloseIcon" @click="emit('remove')"></BccButton>
         </div>
-        <div class="grid grid-cols-1 gap-2">
-            <Node v-for="_, i of model.nodes" :schema="schema" v-model="model.nodes[i]" @remove="model.nodes.splice(i, 1)"/>
+        <div class="grid grid-cols-1 gap-1 ml-3">
+            <Node v-for="_, i of modelValue.nodes" :schema="schema" :modelValue="modelValue.nodes[i]" @update:model-value="updateNode($event, i)" @remove="removeNode(i)"/>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { PropType, toRaw, toRef, watch } from 'vue';
-import {FilterNodeLogical, Schema} from '../../types'
-import { BccButton } from '@bcc-code/design-library-vue';
-import { RemoveIcon } from '@bcc-code/icons-vue';
+import { PropType, computed, toRaw } from 'vue';
+import {FilterNode, FilterNodeLogical, Schema} from '../../types'
+import { BccButton, BccSelect } from '@bcc-code/design-library-vue';
+import { CloseIcon, } from '@bcc-code/icons-vue';
 import Node from './node.vue';
 import NodeAdd from './node-add.vue';
 
@@ -30,16 +34,39 @@ const props = defineProps({
     }
 })
 
-const model = toRef(structuredClone(toRaw(props.modelValue)))
-watch(model, (v) => {
-    emit('update:modelValue', v)
-}, {deep: true})
 
+const operator = computed({
+    get() { return props.modelValue.operator},
+    set(v: string) {
+        const filterCopy = getFilterCopy()
+        filterCopy.operator = v as 'and' | 'or'
+        emit('update:modelValue', filterCopy)
+    }
+})
 
-function swapOperator() {
-    model.value.operator = model.value.operator === 'and' ? 'or' : 'and'
+function addNode(n: FilterNode) {
+    const filterCopy = getFilterCopy()
+    filterCopy.nodes.push(n)
+    emit('update:modelValue', filterCopy)
 }
 
+function updateNode(n: FilterNode, ind: number) {
+    const filterCopy = getFilterCopy()
+    filterCopy.nodes[ind] =  n
+    emit('update:modelValue', filterCopy)
+}
+
+function removeNode(ind: number) {
+    const filterCopy = getFilterCopy()
+    filterCopy.nodes.splice(ind, 1)
+    emit('update:modelValue', filterCopy)
+}
+
+
 const emit = defineEmits(['update:modelValue', 'remove'])
+
+function getFilterCopy() {
+    return structuredClone(toRaw(props.modelValue))
+}
 
 </script>

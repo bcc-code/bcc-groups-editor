@@ -39,7 +39,7 @@ export type Filter<T = FilterContext> =
   | LogicalFilter<Partial<T>>
   | FieldFilter<Partial<T>>;
 export type FieldFilter<T = FilterContext> = {
-  [field in keyof T]: FieldFilterOperator | FieldFilter<Partial<T[field]>>;
+  [field in keyof T]: FieldFilterOperator;
 };
 export type LogicalFilterOR<T = FilterContext> = {
   _or: Filter<Partial<T>>[];
@@ -107,7 +107,14 @@ export type FilterSchema = {};
 
 export type Schema = Record<string, SchemaField>;
 
-export type SchemaType = "string" | "integer" | "float" | "date" | "date-time";
+export type SchemaType =
+  | "string"
+  | "integer"
+  | "float"
+  | "boolean"
+  | "date"
+  | "date-time"
+  | "object";
 
 export type SchemaField = SchemaType | SchemaFieldOpts;
 
@@ -115,4 +122,5 @@ export type SchemaFieldOpts = {
   name?: string;
   type: SchemaType;
   choices?: string[];
+  schema?: Schema;
 };

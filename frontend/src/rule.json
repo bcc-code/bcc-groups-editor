@@ -1,14 +1,67 @@
 {
-    "name": {
-        "name": "Full name",
-        "type": "string"
-    },
-    "age": "integer",
+    "uid": "string",
+    "personID": "integer",
+    "firstName": "string",
+    "middleName": "string",
+    "lastName": "string",
+    "displayName": "string",
     "gender": {
         "type": "string",
         "choices": [
             "Male",
-            "Female"
+            "Female",
+            "Unknown"
         ]
-    }
+    },
+    "birthDate": "date",
+    "deceasedDate": "date",
+    "maritalStatus": {
+        "type": "string",
+        "choices": [
+            "Single",
+            "Married",
+            "Widowed",
+            "Separated",
+            "SingleParent",
+            "Unknown"
+        ]
+    },
+    "email": "string",
+    "emailVerified": "boolean",
+    "cellPhone": "string",
+    "cellPhoneVerified": "boolean",
+    "homePhone": "string",
+    "homePhoneVerified": "boolean",
+    "address": {
+        "type": "object",
+        "schema": {
+            "address1": "string",
+            "address2": "string",
+            "address3": "string",
+            "city": "string",
+            "countryCode": "string",
+            "postalCode": "string",
+            "region": "string"
+        }
+    },
+    "preferences": {
+        "type": "object",
+        "schema": {
+            "visibility": {
+                "type": "object",
+                "schema": {
+                    "birthdayList": "boolean",
+                    "search": {
+                        "type": "string",
+                        "choices": [
+                            "Global",
+                            "Districts",
+                            "Hidden"
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    "lastChangedDate": "date-time"
 }

@@ -24,9 +24,9 @@
             <option>Dynamic</option>
         </BccSelect>
 
-        <div class="w-full">
+        <div v-if="editedGroup.type == 'Dynamic'" class="w-full">
             <label class="bcc-form-label mb-2">Rule</label>
-            <RuleInput v-if="editedGroup.type == 'Dynamic'"  v-model="editedGroup.rule" :schema="(ruleSchema as Schema)"/>
+            <RuleInput   v-model="editedGroup.rule" :schema="(ruleSchema as Schema)"/>
         </div>
 
         <BccInput v-model="editedGroup.orgUid" label="Org Uid"/>
