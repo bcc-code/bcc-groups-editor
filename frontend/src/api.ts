@@ -39,7 +39,7 @@ export class Api {
       qry.append("filter", JSON.stringify({ _or: filters }));
     }
 
-    return this.makeRequest("GET", `/groups?${qry.toString()}`);
+    return this.makeRequest("GET", `groups?${qry.toString()}`);
   }
 
   async saveGroup(group: Group): Promise<Group> {
@@ -50,12 +50,12 @@ export class Api {
         getGroupForSave(group)
       );
     } else {
-      return this.makeRequest("POST", `/groups`, getGroupForSave(group));
+      return this.makeRequest("POST", `groups`, getGroupForSave(group));
     }
   }
 
   async deleteGroup(uid: string): Promise<Group> {
-    return this.makeRequest("DELETE", `/groups/${uid}`);
+    return this.makeRequest("DELETE", `groups/${uid}`);
   }
 
   private async makeRequest(
