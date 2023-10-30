@@ -5,7 +5,11 @@
         @focus="open"
         @blur="close"
         >
-        <p class="cursor-pointer">Add a filter</p>
+        <div>
+
+            <slot name="header" :isOpen="isOpen">
+            </slot>
+        </div>
 
         <div v-if="isOpen" class="absolute bg-white shadow-md p-4 z-10">
             <slot :close="close"></slot>

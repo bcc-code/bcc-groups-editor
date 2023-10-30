@@ -26,7 +26,7 @@
 
         <div v-if="editedGroup.type == 'Dynamic'" class="w-full">
             <label class="bcc-form-label mb-2">Rule</label>
-            <RuleInput   v-model="editedGroup.rule" :schema="(ruleSchema as Schema)"/>
+            <RuleInput v-model="editedGroup.rule" :schema="(ruleSchema as SchemaField[])"/>
         </div>
 
         <BccInput v-model="editedGroup.orgUid" label="Org Uid"/>
@@ -52,9 +52,9 @@ import { BccAlert, BccButton, BccInput, BccSelect } from '@bcc-code/design-libra
 import RuleInput from './filter/interface.vue'
 import { AddIcon, DeleteIcon } from '@bcc-code/icons-vue';
 import { PropType, computed, ref } from 'vue';
-import ruleSchema from '../rule.json'
+import ruleSchema from '../schema.json'
 
-import {Group, Schema} from '../types'
+import {Group, SchemaField} from '../types'
 import { Api } from '../api';
 
 const props = defineProps({

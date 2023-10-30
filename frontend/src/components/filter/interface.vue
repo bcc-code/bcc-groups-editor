@@ -5,7 +5,7 @@
 
 <script setup lang="ts">
 import { PropType, computed } from 'vue';
-import { Filter, FilterNode,ClientFilterOperator, Schema } from '../../types'
+import { Filter, FilterNode,ClientFilterOperator, SchemaField } from '../../types'
 import Node from './node.vue';
 import { FieldFilterOperator } from '../../types';
 
@@ -15,7 +15,7 @@ const props = defineProps({
         required: true
     },
     schema: {
-        type: Object as PropType<Schema>,
+        type: Object as PropType<SchemaField[]>,
         required: true
     }
 })
@@ -26,7 +26,7 @@ const emits = defineEmits(['update:modelValue'])
 const model = computed<FilterNode>({
     get() {
         const filterObj: Filter = JSON.parse(props.modelValue ? props.modelValue : '{}')
-        const f = getNodesFromFilter(filterObj)
+        const f = getNodesFromFilter(filterObj, props.schema)
         if (!f) {
             return {
                 type: 'logical',
@@ -49,7 +49,7 @@ const model = computed<FilterNode>({
     }
 })
 
-function getNodesFromFilter(filter: Filter): FilterNode | undefined {
+function getNodesFromFilter(filter: Filter, schema: SchemaField[], prefix = ''): FilterNode | undefined {
     const nodes: FilterNode[] = []
 
     const logicalOperators = ['_and', '_or'] as const
@@ -57,7 +57,7 @@ function getNodesFromFilter(filter: Filter): FilterNode | undefined {
     for(const op of logicalOperators) {
         if ( op in filter) {
             const subfilters = filter[op as never] as Filter[]
-            const subnodes = subfilters.map(f => getNodesFromFilter(f)).filter(f => f !== undefined) as FilterNode[]
+            const subnodes = subfilters.map(f => getNodesFromFilter(f, schema, prefix)).filter(f => f !== undefined) as FilterNode[]
             nodes.push({ 
                 type: 'logical',
                 operator: op == '_and' ? 'and': 'or',
@@ -67,13 +67,24 @@ function getNodesFromFilter(filter: Filter): FilterNode | undefined {
     }
 
     for(const field of Object.keys(filter)) {
-        if (field == '_and' || field == '_or') continue;
+        let fieldSchema = schema.find(f => f.key === field)
+        if(!fieldSchema) continue
+
+        if(fieldSchema.type === 'object') {
+            const subnode = getNodesFromFilter(filter[field as never] as Filter, fieldSchema.fields ?? [], field)
+            if(subnode)
+                nodes.push(subnode)
+            continue;
+        }
+
         const fieldFilter = filter[field as never] as FieldFilterOperator
 
         for(const op of Object.keys(fieldFilter)) {
+            let fieldJoined = prefix ? `${prefix}.${field}`: field;
+
             nodes.push({
                 type: 'field',
-                field: field,
+                field: fieldJoined,
                 operator: op as ClientFilterOperator,
                 value: fieldFilter[op as never]
             })
@@ -98,8 +109,16 @@ function getFilterFromNode(n: FilterNode): Record<string, any> {
             if (n.operator == 'or') op = '_or' 
             return { [op]: n.nodes.map(getFilterFromNode)  }
         
-        case 'field': 
-            return { [n.field]: {[n.operator]: n.value} }
+        case 'field': {
+            const fieldParts = n.field.split(".")
+            let filter =  { [fieldParts.pop() ?? '']: {[n.operator]: n.value} }
+
+            let fieldPart: string | undefined
+            while(fieldPart = fieldParts.pop()) {
+                filter = {[fieldPart]: filter}
+            }
+            return filter
+        }
         
         default:
             return {}

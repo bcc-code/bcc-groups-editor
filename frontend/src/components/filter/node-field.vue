@@ -1,9 +1,10 @@
 <template>
     <div class="py-1 pl-1 flex flex-wrap items-center gap-2 rounded bg-black bg-opacity-5">
 
-        <BccSelect size="sm" class="w-48" v-model="fieldName">
+        <!-- <BccSelect size="sm" class="w-48" v-model="fieldName">
             <FieldOptions :schema="schema"/>
-        </BccSelect>
+        </BccSelect> -->
+        {{ fieldName }}
         <OperatorSelector v-model="operator" :schema="fieldSchema"/>
 
         <template v-if="!nullOperators.includes(operator)">
@@ -20,11 +21,11 @@
 
 <script setup lang="ts">
 import { PropType, computed, toRaw } from 'vue';
-import {FilterNodeField, Schema, ClientFilterOperator} from '../../types'
+import {FilterNodeField, SchemaField, ClientFilterOperator} from '../../types'
 import { BccButton, BccCheckbox, BccInput, BccSelect } from '@bcc-code/design-library-vue';
 import { CloseIcon } from '@bcc-code/icons-vue';
 import OperatorSelector from './operator-selector.vue';
-import FieldOptions from './field-options.vue';
+// import FieldOptions from './field-options.vue';
 
 const props = defineProps({
     modelValue: {
@@ -32,13 +33,42 @@ const props = defineProps({
         required: true
     },
     schema: {
-        type: Object as PropType<Schema>,
+        type: Object as PropType<SchemaField[]>,
         required: true
     }
 })
 
 const fieldSchema = computed(() => {
-    return props.schema[props.modelValue.field]
+    const fieldParts = props.modelValue.field.split(".")
+
+    let schema = props.schema
+    let fieldSchema:SchemaField | undefined
+    for(const part of fieldParts) {
+        fieldSchema = schema.find(f => f.key === part)
+        if(!fieldSchema) throw Error("field does not exist")
+
+        schema = fieldSchema.fields ?? []
+    }
+    if(!fieldSchema) throw Error("field does not exist")
+
+    return fieldSchema
+})
+
+const fieldName = computed(() => {
+    const fieldParts = props.modelValue.field.split(".")
+
+    let schema = props.schema
+    let fieldNameParts = []
+    for(const part of fieldParts) {
+        const fieldSchema = schema.find(f => f.key === part)
+        if(!fieldSchema) throw Error("field does not exist")
+        fieldNameParts.push(fieldSchema.name)
+
+        schema = fieldSchema.fields ?? []
+    }
+
+    return fieldNameParts.join("->")
+
 })
 
 const fieldType = computed(() => {
@@ -78,20 +108,18 @@ const fieldValueString = computed({
     }
 })
 
-const fieldName = computed({
-    get() {
-        return props.modelValue.field
-    },
-    set(v : string) {
-        const modelCopy = getNodeCopy()
+// const fieldName = computed({
+//     get() {
+//         return props.modelValue.field
+//     },
+//     set(v : string) {
+//         const modelCopy = getNodeCopy()
 
-        modelCopy.field = v
-        modelCopy.operator = '_eq'
-        modelCopy.value = null
-        emit('update:modelValue', modelCopy)
+//         modelCopy.field = v
+//         emit('update:modelValue', modelCopy)
 
-    }
-})
+//     }
+// })
 
 const operator = computed({
     get() {
@@ -100,12 +128,6 @@ const operator = computed({
     set(v : ClientFilterOperator) {
         const modelCopy = getNodeCopy()
         modelCopy.operator = v
-
-        if(nullOperators.includes(v)) {
-            modelCopy.value = true
-        } else {
-            modelCopy.value = null
-        }
         emit('update:modelValue', modelCopy)
     }
 })

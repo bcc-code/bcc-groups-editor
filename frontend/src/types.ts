@@ -72,8 +72,7 @@ export type FieldFilterOperator = {
 export type FilterNode =
   | FilterNodeField
   | FilterNodeLogical
-  | FilterNodeRelationalMany
-  | FilterNodeRelationalOne;
+  | FilterNodeRelationalMany;
 
 export type FilterNodeField = {
   type: "field";
@@ -93,21 +92,12 @@ export type FilterNodeLogical = {
 export type FilterNodeRelationalMany = {
   type: "relational-many";
 
+  field: string;
   relType: FilterRelationType;
   nodes: FilterNode[];
 };
 
-export type FilterNodeRelationalOne = {
-  type: "relational-one";
-
-  nodes: FilterNode[];
-};
-
-export type FilterSchema = {};
-
-export type Schema = Record<string, SchemaField>;
-
-export type SchemaType =
+export type SchemaFieldType =
   | "string"
   | "integer"
   | "float"
@@ -116,11 +106,10 @@ export type SchemaType =
   | "date-time"
   | "object";
 
-export type SchemaField = SchemaType | SchemaFieldOpts;
-
-export type SchemaFieldOpts = {
-  name?: string;
-  type: SchemaType;
+export type SchemaField<T extends SchemaFieldType = SchemaFieldType> = {
+  key: string;
+  name: string;
+  type: T;
   choices?: string[];
-  schema?: Schema;
+  fields: T extends "object" ? SchemaField[] : undefined;
 };
