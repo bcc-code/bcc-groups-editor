@@ -47,6 +47,12 @@ export function getPersonSchema(): SchemaField[] {
       type: "date",
     },
     {
+      name: "Gender",
+      key: "gender",
+      type: "string",
+      choices: ["Male", "Female", "Unknown"],
+    },
+    {
       name: "Marital Status",
       key: "maritalStatus",
       type: "string",
