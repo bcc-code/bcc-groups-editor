@@ -37,14 +37,9 @@
 import { BccBadge, BccButton, BccInput, BccTable } from '@bcc-code/design-library-vue';
 import { AddIcon, SearchIcon } from '@bcc-code/icons-vue';
 import { PropType, onMounted, ref, watchEffect } from 'vue';
-import { Direction } from '../types';
+import { Column, Direction } from '../types';
 import { Api } from '../api';
 
-type Column = {
-    key: string;
-    text?: string;
-    sortable?: boolean;
-};
 const columns = [
     {text: "Uid", key: "uid"},
     {text: "Name", key: "name"},

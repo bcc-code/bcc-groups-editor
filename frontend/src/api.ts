@@ -1,4 +1,4 @@
-import { Direction, Group } from "./types";
+import { Direction, Group, GroupMember, Person } from "./types";
 
 export interface TokenSource {
   Token(): Promise<string>;
@@ -56,6 +56,58 @@ export class Api {
 
   async deleteGroup(uid: string): Promise<Group> {
     return this.makeRequest("DELETE", `groups/${uid}`);
+  }
+
+  async getGroupMembers(
+    groupUid: string,
+    search: string,
+    sortDirection: Direction,
+    sortBy?: string
+  ): Promise<Person[]> {
+    const qry = new URLSearchParams({
+      fields: "person.displayName,person.uid,person.personID",
+    });
+
+    if (sortBy) {
+      qry.append(
+        "sort",
+        `${sortDirection === "descending" ? "-" : ""}${sortBy}`
+      );
+    }
+    if (search) {
+      const filter = {
+        person: {
+          _or: [
+            { displayName: { _contains: search } },
+            { personID: { _eq: parseInt(search) } },
+          ],
+        },
+      };
+
+      qry.append("filter", JSON.stringify(filter));
+    }
+
+    const res = (await this.makeRequest(
+      "GET",
+      `groups/${groupUid}/members?${qry.toString()}`
+    )) as GroupMember[];
+    return res.map((m) => m.person);
+  }
+
+  async findPersons(search: string): Promise<Person[]> {
+    const qry = new URLSearchParams({
+      fields: "displayName,uid,personID",
+      limit: "10",
+    });
+    if (search) {
+      qry.append("search", search);
+    }
+
+    const res = (await this.makeRequest(
+      "GET",
+      `persons?${qry.toString()}`
+    )) as GroupMember[];
+    return res.map((m) => m.person);
   }
 
   private async makeRequest(

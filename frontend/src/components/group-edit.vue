@@ -40,6 +40,8 @@
 
 
         <BccInput disabled v-model="editedGroup.appUid" label="App Uid"/>
+
+        <GroupMembers v-bind="{group, api}"/>
     </div>
 </template>
 
@@ -50,6 +52,7 @@ import { PropType, computed, ref } from 'vue';
 
 import {Group} from '../types'
 import { Api } from '../api';
+import GroupMembers from './group-members.vue';
 
 const props = defineProps({
     group: {type: Object as PropType<Group>, default: null},
