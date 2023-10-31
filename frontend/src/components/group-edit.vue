@@ -25,7 +25,6 @@
         </BccSelect>
 
         <div v-if="editedGroup.type == 'Dynamic'" class="w-full">
-            {{ editedGroup.rule }}
             <label class="bcc-form-label mb-2">Rule</label>
             <RuleInput v-model="editedGroup.rule" :schema="(schema)"/>
         </div>
@@ -42,8 +41,6 @@
                 <BccButton variant="tertiary" size="xs" :padding="false" @click="editedGroup.tags.splice(i, 1)" :icon="DeleteIcon"/>
             </div>
         </div>
-
-
         <BccInput disabled v-model="editedGroup.appUid" label="App Uid"/>
     </div>
 </template>
@@ -53,18 +50,17 @@ import { BccAlert, BccButton, BccInput, BccSelect } from '@bcc-code/design-libra
 import RuleInput from './filter/interface.vue'
 import { AddIcon, DeleteIcon } from '@bcc-code/icons-vue';
 import { PropType, computed, ref } from 'vue';
-import ruleSchema from '../rule.json'
 
 import {Group} from '../types'
 import { Api } from '../api';
-import { parseSchema } from '../parse-schema';
+import { getPersonSchema } from '../schema';
 
 const props = defineProps({
     group: {type: Object as PropType<Group>, default: null},
     api: {type: Object as PropType<Api>, required: true}
 })
 
-const schema = parseSchema(ruleSchema as any);
+const schema = getPersonSchema()
 
 const editedGroup = ref<Group>(JSON.parse(JSON.stringify(props.group)))
 
