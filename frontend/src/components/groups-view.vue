@@ -37,7 +37,7 @@
 import { BccBadge, BccButton, BccInput, BccTable } from '@bcc-code/design-library-vue';
 import { AddIcon, SearchIcon } from '@bcc-code/icons-vue';
 import { PropType, onMounted, ref, watchEffect } from 'vue';
-import { Direction, Group } from '../types';
+import { Column, Direction, Group } from '../types';
 import { Api } from '../api';
 
 const columns = [

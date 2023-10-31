@@ -14,13 +14,11 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, onMounted, ref, watchEffect } from 'vue';
+import { PropType, onMounted, ref } from 'vue';
 import { Direction, Group, Person,Column } from '../types';
 import { Api } from '../api';
 import { BccInput, BccTable } from '@bcc-code/design-library-vue';
 import { SearchIcon } from '@bcc-code/icons-vue';
-
-
 
 const columns = [
     {text: "Uid", key: "uid"},
