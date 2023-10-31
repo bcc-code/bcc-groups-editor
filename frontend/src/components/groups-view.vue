@@ -37,7 +37,7 @@
 import { BccBadge, BccButton, BccInput, BccTable } from '@bcc-code/design-library-vue';
 import { AddIcon, SearchIcon } from '@bcc-code/icons-vue';
 import { PropType, onMounted, ref, watchEffect } from 'vue';
-import { Column, Direction } from '../types';
+import { Direction, Group } from '../types';
 import { Api } from '../api';
 
 const columns = [
@@ -56,7 +56,7 @@ const props = defineProps({
     api: {type: Object as PropType<Api>, required: true}
 })
 
-const groups = ref<Array<any>>([])
+const groups = ref<Group[]>([])
 
 async function loadGroups() {
     groups.value = await props.api.getGroups(search.value, sortDirection.value, sortBy.value)

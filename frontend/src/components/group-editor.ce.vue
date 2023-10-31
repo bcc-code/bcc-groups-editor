@@ -9,7 +9,7 @@
 import groupsView from './groups-view.vue';
 import groupEdit from './group-edit.vue';
 import {Group} from '../types'
-import {  ref,  watchEffect } from 'vue';
+import { ref, watchEffect } from 'vue';
 import { Api, TokenSource, StaticTokenSource, UrlTokenSource, getEmptyGroup } from '../api';
 
 const props = defineProps({
@@ -36,11 +36,12 @@ function createApi(): Api {
 
 }
 
-const editedGroup = ref<Group | null>(null)
+const editedGroup = ref<Group | null>(getEmptyGroup())
 </script>
 
 <style>
 @import "@bcc-code/design-library-vue/tailwind/index.css";
+@import "vue-multiselect/dist/vue-multiselect.css";
 
 @tailwind base;
 @tailwind components;

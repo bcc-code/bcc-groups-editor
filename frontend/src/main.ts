@@ -1,6 +1,5 @@
-import { defineCustomElement } from "vue";
 import groupEditVue from "./components/group-editor.ce.vue";
+import { createApp } from "vue";
+import "./main.css";
 
-export const GroupEdit = defineCustomElement(groupEditVue);
-
-customElements.define("bcc-group-editor", GroupEdit);
+createApp(groupEditVue).mount("#app");

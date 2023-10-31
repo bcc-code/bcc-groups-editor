@@ -27,7 +27,7 @@ export class Api {
       );
     }
     if (search) {
-      const filters: any[] = [
+      const filters: object[] = [
         { name: { _contains: search } },
         { tags: { _contains: search.split(" ") } },
       ];
@@ -39,7 +39,9 @@ export class Api {
       qry.append("filter", JSON.stringify({ _or: filters }));
     }
 
-    return this.makeRequest("GET", `groups?${qry.toString()}`);
+    return this.makeRequest("GET", `groups?${qry.toString()}`) as Promise<
+      Group[]
+    >;
   }
 
   async saveGroup(group: Group): Promise<Group> {
@@ -48,14 +50,18 @@ export class Api {
         "PUT",
         `/groups/${group.uid}`,
         getGroupForSave(group)
-      );
+      ) as Promise<Group>;
     } else {
-      return this.makeRequest("POST", `groups`, getGroupForSave(group));
+      return this.makeRequest(
+        "POST",
+        `groups`,
+        getGroupForSave(group)
+      ) as Promise<Group>;
     }
   }
 
   async deleteGroup(uid: string): Promise<Group> {
-    return this.makeRequest("DELETE", `groups/${uid}`);
+    return this.makeRequest("DELETE", `groups/${uid}`) as Promise<Group>;
   }
 
   async getGroupMembers(
@@ -113,8 +119,8 @@ export class Api {
   private async makeRequest(
     method: string,
     path: string,
-    body?: any
-  ): Promise<any> {
+    body?: unknown
+  ): Promise<unknown> {
     const headers = new Headers();
     if (this.tokenSource) {
       const token = await this.tokenSource.Token();
@@ -173,7 +179,7 @@ export function getEmptyGroup(): Group {
     name: "",
     rule: "",
     tags: [],
-    type: "Static",
+    type: "Dynamic",
     appUid: "",
     lastChangedDate: "",
   };
