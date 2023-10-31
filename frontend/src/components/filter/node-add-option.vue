@@ -8,13 +8,13 @@
             </div>
         </div>
         <div class="pl-2" v-if="fieldSchema.fields && isOpen">
-            <node-add-option :field-schema="subfield" @add-node="handleSubFieldAdded" v-for="subfield of fieldSchema.fields"/>
+            <node-add-option :field-schema="subfield" @add-node.self="handleSubFieldAdded" v-for="subfield of fieldSchema.fields"/>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { PropType, computed, ref } from 'vue';
+import { PropType, computed, ref, toRaw } from 'vue';
 import { SchemaField, FilterNode, FilterNodeField, FilterNodeRelationalMany } from '../../types';
 import { ExpandLessIcon, ExpandMoreIcon } from '@bcc-code/icons-vue';
 
@@ -49,8 +49,9 @@ function handleHeaderClick() {
 
 function handleSubFieldAdded(f: FilterNodeField | FilterNodeRelationalMany) {
     if(props.fieldSchema.type === 'object') {
-        f.field = `${props.fieldSchema.key}.${f.field}`
-        emit('addNode', f)
+        const nodeFieldCopy = structuredClone(toRaw(f))
+        nodeFieldCopy.field = `${props.fieldSchema.key}.${f.field}`
+        emit('addNode', nodeFieldCopy)
         return;
     }
     if(props.fieldSchema.type === 'relational-many') {

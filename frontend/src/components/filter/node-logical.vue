@@ -5,7 +5,7 @@
                 <option value="and">And</option>
                 <option value="or">Or</option>
             </BccSelect>
-            <NodeAdd :schema="schema" @add-node="addNode($event)"/>
+            <NodeAdd :schema="schema" @add-node.self="addNode($event)"/>
             <BccButton size="xs" context="danger" variant="tertiary" :icon="CloseIcon" @click="emit('remove')"></BccButton>
         </div>
         <div class="grid grid-cols-1 gap-1 ml-3">

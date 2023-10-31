@@ -76,7 +76,7 @@ function getNodesFromFilter(filter: Filter, schema: SchemaField[], prefix = ''):
         if(!fieldSchema) continue
 
         if(fieldSchema.type === 'object') {
-            const subnode = getNodesFromFilter(filter[field as never] as Filter, fieldSchema.fields ?? [], field)
+            const subnode = getNodesFromFilter(filter[field as never] as Filter, fieldSchema.fields ?? [], joinPrefix(field,prefix))
             if(subnode)
                 nodes.push(subnode)
             continue;
@@ -99,7 +99,7 @@ function getNodesFromFilter(filter: Filter, schema: SchemaField[], prefix = ''):
                     type: 'relational-many',
                     relType: op == '_some' ? 'some': 'none',
                     nodes: subnodes,
-                    field: prefix ? `${prefix}.${field}`: field
+                    field: joinPrefix(field,prefix)
                 })
                 delete filter[op as never]
             }
@@ -112,23 +112,21 @@ function getNodesFromFilter(filter: Filter, schema: SchemaField[], prefix = ''):
             let subnodes = [subnode]
             if (subnode.type === 'logical' && subnode.operator === 'and') subnodes = subnode.nodes
 
-            let fieldJoined = prefix ? `${prefix}.${field}`: field;
             nodes.push({
                 type: 'relational-many',
-                field: fieldJoined,
+                field: joinPrefix(field,prefix),
                 relType: 'some',
                 nodes: subnodes
             })
+            continue;
         }
 
         const fieldFilter = filter[field as never] as FieldFilterOperator
 
         for(const op of Object.keys(fieldFilter)) {
-            let fieldJoined = prefix ? `${prefix}.${field}`: field;
-
             nodes.push({
                 type: 'field',
-                field: fieldJoined,
+                field: joinPrefix(field,prefix),
                 operator: op as ClientFilterOperator,
                 value: fieldFilter[op as never]
             })
@@ -144,6 +142,11 @@ function getNodesFromFilter(filter: Filter, schema: SchemaField[], prefix = ''):
         operator: 'and',
         nodes
     }
+}
+
+function joinPrefix(field: string, prefix: string): string {
+    if(!prefix) return field;
+    return `${prefix}.${field}`
 }
 
 function getFilterFromNode(n: FilterNode): Record<string, unknown> {

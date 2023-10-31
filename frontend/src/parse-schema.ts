@@ -13,7 +13,6 @@ type InputSchemaFieldOpts = {
 
 export function parseSchema(s: InputSchema): SchemaField[] {
   const schema: SchemaField[] = [];
-
   for (const key of Object.keys(s)) {
     let field: SchemaField;
     const inputField = s[key];
@@ -36,5 +35,5 @@ export function parseSchema(s: InputSchema): SchemaField[] {
 
     schema.push(field);
   }
-  return [];
+  return schema;
 }

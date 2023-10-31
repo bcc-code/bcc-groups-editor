@@ -63,5 +63,21 @@
             }
         }
     },
+    "affiliations": {
+        "type": "relational-many",
+        "schema": {
+            "orgUid": "string",
+            "validFrom": "date-time",
+            "validTo": "date-time",
+            "type": {
+                "type": "string",
+                "choices": [
+                    "Member",
+                    "Participant",
+                    "Affiliate"
+                ]
+            }
+        }
+    },
     "lastChangedDate": "date-time"
 }

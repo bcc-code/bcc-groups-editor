@@ -40,7 +40,6 @@ const props = defineProps({
 
 const fieldSchema = computed(() => {
     const fieldParts = props.modelValue.field.split(".")
-
     let schema = props.schema
     let fieldSchema:SchemaField | undefined
     for(const part of fieldParts) {
@@ -107,19 +106,6 @@ const fieldValueString = computed({
         fieldValue.value = value
     }
 })
-
-// const fieldName = computed({
-//     get() {
-//         return props.modelValue.field
-//     },
-//     set(v : string) {
-//         const modelCopy = getNodeCopy()
-
-//         modelCopy.field = v
-//         emit('update:modelValue', modelCopy)
-
-//     }
-// })
 
 const operator = computed({
     get() {
