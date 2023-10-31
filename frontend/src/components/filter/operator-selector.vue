@@ -14,11 +14,9 @@
             <option value="_lt">Is Less Than</option>
             <option value="_lte">Is Less Than Or Equal</option>
         </template>
-        <template v-if="canContain">
+        <template v-if="fieldType === 'string'">
             <option value="_contains">Contains</option>
             <option value="_ncontains">Does Not Contain</option>
-        </template>
-        <template v-if="fieldType === 'string'">
             <option value="_starts_with">Starts With</option>
             <option value="_nstarts_with">Does Not Start With</option>
             <option value="_ends_with">Ends With</option>
@@ -72,14 +70,6 @@ const isSortable = computed(() => {
     }
 })
 
-const canContain = computed(() => {
-    switch(fieldType.value) {
-        case 'string':
-            return true
-        default:
-            return false
-    }
-})
 
 const emit = defineEmits<{
     'update:modelValue': [FilterOperator]

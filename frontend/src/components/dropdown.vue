@@ -6,11 +6,9 @@
         @blur="close"
         >
         <div>
-
             <slot name="header" :isOpen="isOpen">
             </slot>
         </div>
-
         <div v-if="isOpen" class="absolute bg-white shadow-md p-4 z-10">
             <slot :close="close"></slot>
         </div>

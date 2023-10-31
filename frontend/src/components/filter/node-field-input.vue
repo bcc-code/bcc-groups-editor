@@ -13,10 +13,11 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, computed, ref, toRaw } from 'vue';
+import { PropType, computed, ref } from 'vue';
 import { SchemaField } from '../../types';
 import { BccBadge, BccButton, BccCheckbox, BccInput, BccSelect } from '@bcc-code/design-library-vue';
 import { AddIcon, DeleteIcon } from '@bcc-code/icons-vue';
+import { deepCopy } from '../../schema-helpers';
 
 
 const props = defineProps({
@@ -56,7 +57,7 @@ const fieldValueString = computed({
 
 function addCurrentValue() {
     if(Array.isArray(props.modelValue)) {
-        const valueCopy = structuredClone(toRaw(props.modelValue))
+        const valueCopy = deepCopy(props.modelValue)
         valueCopy.push(currentValue.value)
         emit('update:modelValue', valueCopy)
     } else {
@@ -69,7 +70,7 @@ function removeItem(i: number) {
     if(!Array.isArray(props.modelValue)) {
         return
     }
-    const valueCopy = structuredClone(toRaw(props.modelValue))
+    const valueCopy = deepCopy(props.modelValue)
     valueCopy.splice(i, 1);
     emit('update:modelValue', valueCopy)
 }

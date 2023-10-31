@@ -35,7 +35,7 @@ defineProps({
 function addLogicalGroup() {
     emit('addNode', {
         type: 'logical',
-        operator: 'and',
+        operator: '_and',
         nodes: []
     })
 }

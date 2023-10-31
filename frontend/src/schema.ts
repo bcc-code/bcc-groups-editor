@@ -14,7 +14,7 @@ export function getPersonSchema(): SchemaField[] {
     {
       name: "Person ID",
       key: "personID",
-      type: "string",
+      type: "integer",
     },
     {
       name: "First Name",
@@ -441,7 +441,7 @@ const orgSchema: SchemaField[] = [
   {
     name: "Org ID",
     key: "orgID",
-    type: "string",
+    type: "integer",
   },
   {
     name: "Name",

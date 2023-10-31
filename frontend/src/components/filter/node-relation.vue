@@ -2,9 +2,9 @@
     <div class="py-1 pl-1 rounded bg-black bg-opacity-5">
         <div class="flex items-center gap-2 pb-1">
             {{ fieldName }}
-            <BccSelect size="sm" class="w-20" v-model="relationType">
-                <option value="some">Some</option>
-                <option value="none">None</option>
+            <BccSelect size="sm" class="w-20" v-model="operator">
+                <option value="_some">Some</option>
+                <option value="_none">None</option>
             </BccSelect>
             <NodeAdd :schema="subSchema" @add-node="addNode($event)"/>
             <BccButton size="xs" context="danger" variant="tertiary" :icon="CloseIcon" @click="emit('remove')"></BccButton>
@@ -16,12 +16,14 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, computed, toRaw, } from 'vue';
-import {  FilterNode, FilterNodeRelationalMany, SchemaField} from '../../types'
+import { PropType, computed, } from 'vue';
+import {  FilterNode, FilterNodeRelationalMany, RelationOperator, SchemaField} from '../../types'
 import { BccButton, BccSelect } from '@bcc-code/design-library-vue';
 import NodeAdd from './node-add.vue';
 import { CloseIcon } from '@bcc-code/icons-vue';
 import Node from './node.vue';
+import { getFieldByKey, getNameByKey } from '../../schema-helpers';
+import { deepCopy } from '../../schema-helpers';
 
 const props = defineProps({
     modelValue: {
@@ -35,68 +37,40 @@ const props = defineProps({
 })
 
 const subSchema = computed(() => {
-    const fieldParts = props.modelValue.field.split(".")
-
-    let schema = props.schema
-    let fieldSchema:SchemaField | undefined
-    for(const part of fieldParts) {
-        fieldSchema = schema.find(f => f.key === part)
-        if(!fieldSchema) throw Error("field does not exist")
-
-        schema = fieldSchema.fields ?? []
-    }
-    if(!fieldSchema) throw Error("field does not exist")
-
+    const fieldSchema = getFieldByKey(props.schema, props.modelValue.field)
     return fieldSchema.fields ?? []
 })
 
 
 const fieldName = computed(() => {
-    const fieldParts = props.modelValue.field.split(".")
-
-    let schema = props.schema
-    let fieldNameParts = []
-    for(const part of fieldParts) {
-        const fieldSchema = schema.find(f => f.key === part)
-        if(!fieldSchema) throw Error("field does not exist")
-        fieldNameParts.push(fieldSchema.name)
-
-        schema = fieldSchema.fields ?? []
-    }
-
-    return fieldNameParts.join("->")
-
+    return getNameByKey(props.schema, props.modelValue.field)
 })
 
-const relationType = computed({
+const operator = computed({
     get() { return props.modelValue.operator},
     set(v: string) {
-        const filterCopy = getFilterCopy()
-        filterCopy.operator = v as 'some' | 'none'
+        const filterCopy = deepCopy(props.modelValue)
+        filterCopy.operator = v as RelationOperator
         emit('update:modelValue', filterCopy)
     }
 })
 
 function addNode(n: FilterNode) {
-    const filterCopy = getFilterCopy()
+    const filterCopy = deepCopy(props.modelValue)
     filterCopy.nodes.push(n)
     emit('update:modelValue', filterCopy)
 }
 
 function updateNode(n: FilterNode, ind: number) {
-    const filterCopy = getFilterCopy()
+    const filterCopy = deepCopy(props.modelValue)
     filterCopy.nodes[ind] =  n
     emit('update:modelValue', filterCopy)
 }
 
 function removeNode(ind: number) {
-    const filterCopy = getFilterCopy()
+    const filterCopy = deepCopy(props.modelValue)
     filterCopy.nodes.splice(ind, 1)
     emit('update:modelValue', filterCopy)
-}
-
-function getFilterCopy() {
-    return structuredClone(toRaw(props.modelValue))
 }
 
 const emit = defineEmits(['update:modelValue', 'remove'])

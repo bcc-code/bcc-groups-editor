@@ -46,8 +46,8 @@ export const filterOperatorsString: FilterOperator[] = [
 export const filterOperatorsNull: FilterOperator[] = ["_null", "_nnull"];
 export const filterOperatorsArray: FilterOperator[] = ["_in", "_nin"];
 
-export const relationOperators = ["_some", "_none"];
-export const logicalOperators = ["_and", "_or"];
+export const relationOperators = ["_some", "_none"] as const;
+export const logicalOperators = ["_and", "_or"] as const;
 
 export type RelationOperator = (typeof relationOperators)[number];
 export type LogicalOperator = (typeof logicalOperators)[number];

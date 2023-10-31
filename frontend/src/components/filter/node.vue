@@ -2,7 +2,6 @@
     <NodeLogical v-if="model.type == 'logical'" :schema="schema" v-model="model"/>
     <NodeField v-else-if="model.type == 'field'" :schema="schema" v-model="model"/>
     <NodeRelation v-else-if="model.type == 'relational-many'" :schema="schema" v-model="model"/>
-    <div v-else>unsupported</div>
 </template>
 
 <script setup lang="ts">

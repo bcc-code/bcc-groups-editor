@@ -14,14 +14,13 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, computed, ref, toRaw } from 'vue';
+import { PropType, computed, ref } from 'vue';
 import { SchemaField, FilterNode, FilterNodeField, FilterNodeRelationalMany } from '../../types';
 import { ExpandLessIcon, ExpandMoreIcon } from '@bcc-code/icons-vue';
-
+import { deepCopy } from '../../schema-helpers';
 
 const props = defineProps({
     fieldSchema: {type: Object as PropType<SchemaField>, required: true}
-
 })
 
 const isOpen = ref(false)
@@ -49,7 +48,7 @@ function handleHeaderClick() {
 
 function handleSubFieldAdded(f: FilterNodeField | FilterNodeRelationalMany) {
     if(props.fieldSchema.type === 'object') {
-        const nodeFieldCopy = structuredClone(toRaw(f))
+        const nodeFieldCopy = deepCopy(f)
         nodeFieldCopy.field = `${props.fieldSchema.key}.${f.field}`
         emit('addNode', nodeFieldCopy)
         return;
@@ -59,11 +58,9 @@ function handleSubFieldAdded(f: FilterNodeField | FilterNodeRelationalMany) {
             type: 'relational-many',
             field: props.fieldSchema.key,
             nodes: [f],
-            operator: 'some'
+            operator: '_some'
         }
         emit('addNode', node )
     }
 }
-
-
 </script>

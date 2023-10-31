@@ -9,12 +9,13 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, computed, toRaw } from 'vue';
+import { PropType, computed } from 'vue';
 import {FilterNodeField, SchemaField, FilterOperator, filterOperatorsNull, filterOperatorsArray} from '../../types'
 import { BccButton } from '@bcc-code/design-library-vue';
 import {  CloseIcon } from '@bcc-code/icons-vue';
 import OperatorSelector from './operator-selector.vue';
 import NodeFieldInput from './node-field-input.vue';
+import { deepCopy, getFieldByKey, getNameByKey } from '../../schema-helpers';
 
 const props = defineProps({
     modelValue: {
@@ -28,34 +29,11 @@ const props = defineProps({
 })
 
 const fieldSchema = computed(() => {
-    const fieldParts = props.modelValue.field.split(".")
-    let schema = props.schema
-    let fieldSchema:SchemaField | undefined
-    for(const part of fieldParts) {
-        fieldSchema = schema.find(f => f.key === part)
-        if(!fieldSchema) throw Error("field does not exist")
-
-        schema = fieldSchema.fields ?? []
-    }
-    if(!fieldSchema) throw Error("field does not exist")
-
-    return fieldSchema
+    return getFieldByKey(props.schema, props.modelValue.field)
 })
 
 const fieldName = computed(() => {
-    const fieldParts = props.modelValue.field.split(".")
-
-    let schema = props.schema
-    let fieldNameParts = []
-    for(const part of fieldParts) {
-        const fieldSchema = schema.find(f => f.key === part)
-        if(!fieldSchema) throw Error("field does not exist")
-        fieldNameParts.push(fieldSchema.name)
-
-        schema = fieldSchema.fields ?? []
-    }
-
-    return fieldNameParts.join("->")
+    return getNameByKey(props.schema, props.modelValue.field)
 })
 
 const fieldValue = computed({
@@ -63,7 +41,7 @@ const fieldValue = computed({
         return props.modelValue.value
     },
     set(v : unknown) {
-        const nodeCopy = getNodeCopy()
+        const nodeCopy = deepCopy(props.modelValue)
         nodeCopy.value = v
         emit('update:modelValue', nodeCopy)
     }
@@ -75,7 +53,7 @@ const operator = computed({
         return props.modelValue.operator
     },
     set(v : FilterOperator) {
-        const modelCopy = getNodeCopy()
+        const modelCopy = deepCopy(props.modelValue)
         if(filterOperatorsNull.includes(modelCopy.operator)) {
             modelCopy.value = true
         }
@@ -91,8 +69,5 @@ const operator = computed({
 
 const emit = defineEmits(['update:modelValue', 'remove'])
 
-function getNodeCopy(): FilterNodeField {
-    return structuredClone(toRaw(props.modelValue))
-}
 
 </script>

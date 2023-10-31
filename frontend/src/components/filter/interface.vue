@@ -5,7 +5,7 @@
 
 <script setup lang="ts">
 import { PropType, computed } from 'vue';
-import { FilterNode,FilterOperator, SchemaField } from '../../types'
+import { FilterNode,FilterOperator, SchemaField, logicalOperators, relationOperators } from '../../types'
 import Node from './node.vue';
 
 const props = defineProps({
@@ -30,14 +30,14 @@ const model = computed<FilterNode>({
             return {
                 type: 'logical',
                 nodes: [],
-                operator: 'and'
+                operator: '_and'
             }
         }
         if (f.type != 'logical') {
             return {
                 type: 'logical',
                 nodes: [f],
-                operator: 'and'
+                operator: '_and'
             }
         }
         return f
@@ -47,10 +47,6 @@ const model = computed<FilterNode>({
         emits('update:modelValue', JSON.stringify(filterObj) )
     }
 })
-
-const logicalOperators = ['_and', '_or'] as const
-const relationalOperators = ['_some', '_none'] as const
-
 
 function getNodesFromFilter(filter: Record<string, unknown>, schema: SchemaField[], prefix = ''): FilterNode | undefined {
     const nodes: FilterNode[] = []
@@ -64,7 +60,7 @@ function getNodesFromFilter(filter: Record<string, unknown>, schema: SchemaField
         const subnodes = subfilters.map(f => getNodesFromFilter(f, schema, prefix)).filter(f => f !== undefined) as FilterNode[]
         nodes.push({ 
             type: 'logical',
-            operator: op == '_and' ? 'and': 'or',
+            operator: op,
             nodes:subnodes
         })
         
@@ -83,7 +79,7 @@ function getNodesFromFilter(filter: Record<string, unknown>, schema: SchemaField
         if(fieldSchema.type === 'relational-many') {
             const fieldFilter = filter[field] as Record<string, unknown>
 
-            for(const op of relationalOperators) {
+            for(const op of relationOperators) {
                 if (!( op in fieldFilter)) {
                     continue;
                 }
@@ -93,10 +89,10 @@ function getNodesFromFilter(filter: Record<string, unknown>, schema: SchemaField
 
 
                 let subnodes = [subnode]
-                if (subnode.type === 'logical' && subnode.operator === 'and') subnodes = subnode.nodes
+                if (subnode.type === 'logical' && subnode.operator === '_and') subnodes = subnode.nodes
                 nodes.push({ 
                     type: 'relational-many',
-                    operator: op == '_some' ? 'some': 'none',
+                    operator: op,
                     nodes: subnodes,
                     field: joinPrefix(field,prefix)
                 })
@@ -109,12 +105,12 @@ function getNodesFromFilter(filter: Record<string, unknown>, schema: SchemaField
             }
 
             let subnodes = [subnode]
-            if (subnode.type === 'logical' && subnode.operator === 'and') subnodes = subnode.nodes
+            if (subnode.type === 'logical' && subnode.operator === '_and') subnodes = subnode.nodes
 
             nodes.push({
                 type: 'relational-many',
                 field: joinPrefix(field,prefix),
-                operator: 'some',
+                operator: '_some',
                 nodes: subnodes
             })
             continue;
@@ -138,7 +134,7 @@ function getNodesFromFilter(filter: Record<string, unknown>, schema: SchemaField
 
     return {
         type: 'logical',
-        operator: 'and',
+        operator: '_and',
         nodes
     }
 }
@@ -151,9 +147,8 @@ function joinPrefix(field: string, prefix: string): string {
 function getFilterFromNode(n: FilterNode): Record<string, unknown> {
     switch(n.type) {
         case 'logical':
-            let op = '_and'
-            if (n.operator == 'or') op = '_or' 
-            return { [op]: n.nodes.map(getFilterFromNode)  }
+        
+            return { [n.operator]: n.nodes.map(getFilterFromNode)  }
         
         case 'field': {
             const fieldParts = n.field.split(".")
@@ -169,9 +164,7 @@ function getFilterFromNode(n: FilterNode): Record<string, unknown> {
         case 'relational-many': {
             const fieldParts = n.field.split(".")
 
-            let op = '_some'
-            if (n.operator == 'none') op = '_none' 
-            let filter: Record<string, unknown> = { [fieldParts.pop() ?? '']: { [op]: { _and: n.nodes.map(getFilterFromNode)  } }}
+            let filter: Record<string, unknown> = { [fieldParts.pop() ?? '']: { [n.operator]: { _and: n.nodes.map(getFilterFromNode)  } }}
 
             let fieldPart: string | undefined
             while(fieldPart = fieldParts.pop()) {
