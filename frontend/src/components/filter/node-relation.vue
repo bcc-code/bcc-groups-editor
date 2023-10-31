@@ -69,10 +69,10 @@ const fieldName = computed(() => {
 })
 
 const relationType = computed({
-    get() { return props.modelValue.relType},
+    get() { return props.modelValue.operator},
     set(v: string) {
         const filterCopy = getFilterCopy()
-        filterCopy.relType = v as 'some' | 'none'
+        filterCopy.operator = v as 'some' | 'none'
         emit('update:modelValue', filterCopy)
     }
 })

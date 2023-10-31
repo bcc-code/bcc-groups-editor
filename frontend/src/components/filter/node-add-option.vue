@@ -59,7 +59,7 @@ function handleSubFieldAdded(f: FilterNodeField | FilterNodeRelationalMany) {
             type: 'relational-many',
             field: props.fieldSchema.key,
             nodes: [f],
-            relType: 'some'
+            operator: 'some'
         }
         emit('addNode', node )
     }

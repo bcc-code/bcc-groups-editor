@@ -13,61 +13,44 @@ export type GroupType = "Static" | "Dynamic";
 
 export type Direction = "ascending" | "descending";
 
-export type FilterRelationType = "some" | "none";
+export const filterOperators = [
+  "_eq",
+  "_neq",
+  "_lt",
+  "_lte",
+  "_gt",
+  "_gte",
+  "_null",
+  "_nnull",
+  "_in",
+  "_nin",
+  "_contains",
+  "_ncontains",
+  "_starts_with",
+  "_nstarts_with",
+  "_ends_with",
+  "_nends_with",
+] as const;
 
-export type FilterOperator =
-  | "_eq"
-  | "_neq"
-  | "_lt"
-  | "_lte"
-  | "_gt"
-  | "_gte"
-  | "_in"
-  | "_nin"
-  | "_null"
-  | "_nnull"
-  | "_contains"
-  | "_ncontains";
-export type ClientFilterOperator =
-  | FilterOperator
-  | "_starts_with"
-  | "_nstarts_with"
-  | "_ends_with"
-  | "_nends_with";
-export type FilterContext = Record<string, any>;
-export type Filter<T = FilterContext> =
-  | LogicalFilter<Partial<T>>
-  | FieldFilter<Partial<T>>;
-export type FieldFilter<T = FilterContext> = {
-  [field in keyof T]: FieldFilterOperator;
-};
-export type LogicalFilterOR<T = FilterContext> = {
-  _or: Filter<Partial<T>>[];
-};
-export type LogicalFilterAND<T = FilterContext> = {
-  _and: Filter<Partial<T>>[];
-};
-export type LogicalFilter<T = FilterContext> =
-  | LogicalFilterOR<T>
-  | LogicalFilterAND<T>;
-export type FieldFilterOperator = {
-  _eq?: string | number | boolean;
-  _neq?: string | number | boolean;
-  _lt?: string | number;
-  _lte?: string | number;
-  _gt?: string | number;
-  _gte?: string | number;
-  _in?: (string | number)[] | string;
-  _nin?: (string | number)[] | string;
-  _null?: boolean;
-  _nnull?: boolean;
-  _starts_with?: string;
-  _nstarts_with?: string;
-  _ends_with?: string;
-  _nends_with?: string;
-  _contains?: string;
-  _ncontains?: string;
-};
+export type FilterOperator = (typeof filterOperators)[number];
+
+export const filterOperatorsString: FilterOperator[] = [
+  "_contains",
+  "_ncontains",
+  "_starts_with",
+  "_nstarts_with",
+  "_ends_with",
+  "_nends_with",
+];
+
+export const filterOperatorsNull: FilterOperator[] = ["_null", "_nnull"];
+export const filterOperatorsArray: FilterOperator[] = ["_in", "_nin"];
+
+export const relationOperators = ["_some", "_none"];
+export const logicalOperators = ["_and", "_or"];
+
+export type RelationOperator = (typeof relationOperators)[number];
+export type LogicalOperator = (typeof logicalOperators)[number];
 
 export type FilterNode =
   | FilterNodeField
@@ -78,14 +61,14 @@ export type FilterNodeField = {
   type: "field";
 
   field: string;
-  operator: ClientFilterOperator;
-  value: any;
+  operator: FilterOperator;
+  value: unknown;
 };
 
 export type FilterNodeLogical = {
   type: "logical";
 
-  operator: "and" | "or";
+  operator: LogicalOperator;
   nodes: FilterNode[];
 };
 
@@ -93,7 +76,7 @@ export type FilterNodeRelationalMany = {
   type: "relational-many";
 
   field: string;
-  relType: FilterRelationType;
+  operator: RelationOperator;
   nodes: FilterNode[];
 };
 

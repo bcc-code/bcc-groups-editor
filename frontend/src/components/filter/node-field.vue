@@ -2,19 +2,15 @@
     <div class="py-1 pl-1 flex flex-wrap items-center gap-2 rounded bg-black bg-opacity-5">
         {{ fieldName }}
         <OperatorSelector v-model="operator" :schema="fieldSchema"/>
-
-        <template v-if="nullOperators.includes(operator)"></template>
-        
-        <NodeFieldInput v-else v-model="fieldValue" :field-schema="fieldSchema" :is-multiple="arrayOperators.includes(operator)"/>
-
-
+        <template v-if="filterOperatorsNull.includes(operator)"></template>
+        <NodeFieldInput v-else v-model="fieldValue" :field-schema="fieldSchema" :is-multiple="filterOperatorsArray.includes(operator)"/>
         <BccButton size="xs" context="danger" variant="tertiary" :icon="CloseIcon" @click="emit('remove')"></BccButton>
     </div>
 </template>
 
 <script setup lang="ts">
 import { PropType, computed, toRaw } from 'vue';
-import {FilterNodeField, SchemaField, ClientFilterOperator} from '../../types'
+import {FilterNodeField, SchemaField, FilterOperator, filterOperatorsNull, filterOperatorsArray} from '../../types'
 import { BccButton } from '@bcc-code/design-library-vue';
 import {  CloseIcon } from '@bcc-code/icons-vue';
 import OperatorSelector from './operator-selector.vue';
@@ -66,7 +62,7 @@ const fieldValue = computed({
     get() {
         return props.modelValue.value
     },
-    set(v : any) {
+    set(v : unknown) {
         const nodeCopy = getNodeCopy()
         nodeCopy.value = v
         emit('update:modelValue', nodeCopy)
@@ -78,12 +74,12 @@ const operator = computed({
     get() {
         return props.modelValue.operator
     },
-    set(v : ClientFilterOperator) {
+    set(v : FilterOperator) {
         const modelCopy = getNodeCopy()
-        if(nullOperators.includes(modelCopy.operator)) {
+        if(filterOperatorsNull.includes(modelCopy.operator)) {
             modelCopy.value = true
         }
-        if(arrayOperators.includes(v) && !arrayOperators.includes(modelCopy.operator)) {
+        if(filterOperatorsArray.includes(v) && !filterOperatorsArray.includes(modelCopy.operator)) {
             modelCopy.value = []
         }
 
@@ -92,9 +88,6 @@ const operator = computed({
         emit('update:modelValue', modelCopy)
     }
 })
-
-const nullOperators = ["_null", "_nnull"] as ClientFilterOperator[]
-const arrayOperators = ["_in", "_nin"] as ClientFilterOperator[]
 
 const emit = defineEmits(['update:modelValue', 'remove'])
 

@@ -30,12 +30,12 @@
 <script setup lang="ts">
 
 import { BccSelect } from '@bcc-code/design-library-vue';
-import { ClientFilterOperator, SchemaField } from '../../types';
+import { FilterOperator, SchemaField } from '../../types';
 import { PropType, computed } from 'vue';
 
 const props = defineProps({
     modelValue: {
-        type: String as PropType<ClientFilterOperator>,
+        type: String as PropType<FilterOperator>,
         required: true
     },
     schema: {
@@ -49,7 +49,7 @@ const model = computed({
     get() {
         return props.modelValue
     },
-    set(v: ClientFilterOperator) {
+    set(v: FilterOperator) {
         emit('update:modelValue', v)
     }
 })
@@ -82,7 +82,7 @@ const canContain = computed(() => {
 })
 
 const emit = defineEmits<{
-    'update:modelValue': [ClientFilterOperator]
+    'update:modelValue': [FilterOperator]
 }>()
 
 </script>

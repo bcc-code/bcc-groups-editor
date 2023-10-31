@@ -40,7 +40,7 @@ function addLogicalGroup() {
     })
 }
 
-function addNode(f: any) {
+function addNode(f: FilterNode) {
     emit('addNode', f)
 }
 

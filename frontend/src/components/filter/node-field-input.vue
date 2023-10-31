@@ -1,9 +1,9 @@
 <template>
     <div v-if="isMultiple">
-        <BccBadge v-for="(item, i) in (modelValue as any[])" context="neutral" icon-right :icon="DeleteIcon" class="cursor-pointer" @click="removeItem(i)">{{ item }}</BccBadge>
+        <BccBadge v-for="(item, i) in (modelValue as unknown[])" context="neutral" icon-right :icon="DeleteIcon" class="cursor-pointer" @click="removeItem(i)">{{ item }}</BccBadge>
     </div>
-    <BccCheckbox size="sm" v-if="fieldSchema.type === 'boolean'" v-model="fieldValue" :label="fieldValue ? 'True' : 'False'"/>
-    <BccSelect size="sm" v-else-if="fieldSchema.choices" v-model="fieldValue">
+    <BccCheckbox size="sm" v-if="fieldSchema.type === 'boolean'" v-model="(fieldValue as boolean)" :label="fieldValue ? 'True' : 'False'"/>
+    <BccSelect size="sm" v-else-if="fieldSchema.choices" v-model="(fieldValue as string)">
         <option v-for="c of fieldSchema.choices">{{ c }}</option>
     </BccSelect>
     <BccInput v-else size="sm" v-model="fieldValueString"/>
@@ -20,19 +20,19 @@ import { AddIcon, DeleteIcon } from '@bcc-code/icons-vue';
 
 
 const props = defineProps({
-    modelValue: {type: [String, Number, null, Array] as PropType<string | number | null | any[]>, required: true},
+    modelValue: {type: [String, Number, null, Array] as PropType<unknown>, required: true},
     isMultiple: {type: Boolean, default: false},
     fieldSchema: {type: Object as PropType<SchemaField>, required: true}
 })
 
-const currentValue = ref<any>(null)
+const currentValue = ref<unknown>(null)
 
 const fieldValue = computed({
     get() {
         if(props.isMultiple) return currentValue.value
         return props.modelValue
     },
-    set(v : any) {
+    set(v : unknown) {
         if(props.isMultiple) currentValue.value = v
         else emit('update:modelValue', v)
     }
@@ -43,7 +43,7 @@ const fieldValueString = computed({
         return fieldValue.value?.toString() ?? ''
     },
     set(v : string) {
-        let value: any;
+        let value: unknown;
         switch(props.fieldSchema.type) {
             case 'integer': value = parseInt(v); break
             case 'float': value = parseFloat(v); break
