@@ -49,21 +49,26 @@ const model = computed<FilterNode>({
     }
 })
 
+const logicalOperators = ['_and', '_or'] as const
+const relationalOperators = ['_some', '_none'] as const
+
+
 function getNodesFromFilter(filter: Filter, schema: SchemaField[], prefix = ''): FilterNode | undefined {
     const nodes: FilterNode[] = []
 
-    const logicalOperators = ['_and', '_or'] as const
 
     for(const op of logicalOperators) {
-        if ( op in filter) {
-            const subfilters = filter[op as never] as Filter[]
-            const subnodes = subfilters.map(f => getNodesFromFilter(f, schema, prefix)).filter(f => f !== undefined) as FilterNode[]
-            nodes.push({ 
-                type: 'logical',
-                operator: op == '_and' ? 'and': 'or',
-                nodes:subnodes
-            })
+        if (!( op in filter)) {
+            continue;
         }
+        const subfilters = filter[op as never] as Filter[]
+        const subnodes = subfilters.map(f => getNodesFromFilter(f, schema, prefix)).filter(f => f !== undefined) as FilterNode[]
+        nodes.push({ 
+            type: 'logical',
+            operator: op == '_and' ? 'and': 'or',
+            nodes:subnodes
+        })
+        
     }
 
     for(const field of Object.keys(filter)) {
@@ -75,6 +80,45 @@ function getNodesFromFilter(filter: Filter, schema: SchemaField[], prefix = ''):
             if(subnode)
                 nodes.push(subnode)
             continue;
+        }
+        if(fieldSchema.type === 'relational-many') {
+            const fieldFilter = filter[field as never] as Filter
+
+            for(const op of relationalOperators) {
+                if (!( op in fieldFilter)) {
+                    continue;
+                }
+                const subfilter = fieldFilter[op as never] as Filter
+                const subnode = getNodesFromFilter(subfilter, fieldSchema.fields ?? [])
+                if (!subnode) continue;
+
+
+                let subnodes = [subnode]
+                if (subnode.type === 'logical' && subnode.operator === 'and') subnodes = subnode.nodes
+                nodes.push({ 
+                    type: 'relational-many',
+                    relType: op == '_some' ? 'some': 'none',
+                    nodes: subnodes,
+                    field: prefix ? `${prefix}.${field}`: field
+                })
+                delete filter[op as never]
+            }
+
+            const subnode = getNodesFromFilter(fieldFilter, fieldSchema.fields ?? [], field)
+            if(!subnode) {
+                continue;
+            }
+
+            let subnodes = [subnode]
+            if (subnode.type === 'logical' && subnode.operator === 'and') subnodes = subnode.nodes
+
+            let fieldJoined = prefix ? `${prefix}.${field}`: field;
+            nodes.push({
+                type: 'relational-many',
+                field: fieldJoined,
+                relType: 'some',
+                nodes: subnodes
+            })
         }
 
         const fieldFilter = filter[field as never] as FieldFilterOperator
@@ -102,7 +146,7 @@ function getNodesFromFilter(filter: Filter, schema: SchemaField[], prefix = ''):
     }
 }
 
-function getFilterFromNode(n: FilterNode): Record<string, any> {
+function getFilterFromNode(n: FilterNode): Record<string, unknown> {
     switch(n.type) {
         case 'logical':
             let op = '_and'
@@ -112,6 +156,20 @@ function getFilterFromNode(n: FilterNode): Record<string, any> {
         case 'field': {
             const fieldParts = n.field.split(".")
             let filter =  { [fieldParts.pop() ?? '']: {[n.operator]: n.value} }
+
+            let fieldPart: string | undefined
+            while(fieldPart = fieldParts.pop()) {
+                filter = {[fieldPart]: filter}
+            }
+            return filter
+        }
+
+        case 'relational-many': {
+            const fieldParts = n.field.split(".")
+
+            let op = '_some'
+            if (n.relType == 'none') op = '_none' 
+            let filter: Record<string, unknown> = { [fieldParts.pop() ?? '']: { [op]: { _and: n.nodes.map(getFilterFromNode)  } }}
 
             let fieldPart: string | undefined
             while(fieldPart = fieldParts.pop()) {

@@ -2,7 +2,7 @@
     <div class="w-full ">
         <div class="flex justify-between gap-2 items-center hover:bg-slate-200 cursor-pointer" @click="handleHeaderClick">
             <div class=" w-max">{{ fieldSchema.name }}</div>
-            <div v-if="fieldSchema.type === 'object'" class="w-4" >
+            <div v-if="isOpenable" class="w-4" >
                 <ExpandLessIcon v-if="isOpen"/>
                 <ExpandMoreIcon v-else/>
             </div>
@@ -14,8 +14,8 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, ref } from 'vue';
-import { SchemaField, FilterNodeField, FilterNodeRelationalMany } from '../../types';
+import { PropType, computed, ref } from 'vue';
+import { SchemaField, FilterNode, FilterNodeField, FilterNodeRelationalMany } from '../../types';
 import { ExpandLessIcon, ExpandMoreIcon } from '@bcc-code/icons-vue';
 
 
@@ -30,8 +30,12 @@ const emit = defineEmits<{
     addNode: [FilterNodeField | FilterNodeRelationalMany ]
 }>()
 
+const isOpenable = computed(() => {
+    return props.fieldSchema.type === 'object' || props.fieldSchema.type === 'relational-many'
+})
+
 function handleHeaderClick() {
-    if (props.fieldSchema.type === 'object') {
+    if (isOpenable.value) {
        isOpen.value = !isOpen.value
        return;
     }
@@ -44,8 +48,20 @@ function handleHeaderClick() {
 }
 
 function handleSubFieldAdded(f: FilterNodeField | FilterNodeRelationalMany) {
-    f.field = `${props.fieldSchema.key}.${f.field}`
-    emit('addNode', f)
+    if(props.fieldSchema.type === 'object') {
+        f.field = `${props.fieldSchema.key}.${f.field}`
+        emit('addNode', f)
+        return;
+    }
+    if(props.fieldSchema.type === 'relational-many') {
+        const node:FilterNode = {
+            type: 'relational-many',
+            field: props.fieldSchema.key,
+            nodes: [f],
+            relType: 'some'
+        }
+        emit('addNode', node )
+    }
 }
 
 

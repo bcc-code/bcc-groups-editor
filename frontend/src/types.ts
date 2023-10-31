@@ -104,12 +104,13 @@ export type SchemaFieldType =
   | "boolean"
   | "date"
   | "date-time"
-  | "object";
+  | "object"
+  | "relational-many";
 
-export type SchemaField<T extends SchemaFieldType = SchemaFieldType> = {
+export type SchemaField = {
   key: string;
   name: string;
-  type: T;
+  type: SchemaFieldType;
   choices?: string[];
-  fields: T extends "object" ? SchemaField[] : undefined;
+  fields?: SchemaField[];
 };

@@ -25,6 +25,7 @@
         </BccSelect>
 
         <div v-if="editedGroup.type == 'Dynamic'" class="w-full">
+            {{ editedGroup.rule }}
             <label class="bcc-form-label mb-2">Rule</label>
             <RuleInput v-model="editedGroup.rule" :schema="(ruleSchema as SchemaField[])"/>
         </div>

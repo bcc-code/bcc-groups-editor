@@ -83,5 +83,37 @@
                 "type": "string"
             }
         ]
+    },
+    {
+        "name": "Affiliations",
+        "key": "affiliations",
+        "type": "relational-many",
+        "fields": [
+            {
+                "name": "Org",
+                "key": "orgUid",
+                "type": "string"
+            },
+            {
+                "name": "Valid from",
+                "key": "validFrom",
+                "type": "date-time"
+            },
+            {
+                "name": "Valid to",
+                "key": "validTo",
+                "type": "date-time"
+            },
+            {
+                "name": "Type",
+                "key": "type",
+                "type": "string",
+                "choices": [
+                    "Member",
+                    "Participant",
+                    "Affiliate"
+                ]
+            }
+        ]
     }
 ]

@@ -5,7 +5,6 @@
                 <option value="and">And</option>
                 <option value="or">Or</option>
             </BccSelect>
-            <!-- <BccButton size="xs" :variant="'tertiary'" @click="swapOperator">{{ modelValue.operator.toUpperCase() }}</BccButton> -->
             <NodeAdd :schema="schema" @add-node="addNode($event)"/>
             <BccButton size="xs" context="danger" variant="tertiary" :icon="CloseIcon" @click="emit('remove')"></BccButton>
         </div>
@@ -17,7 +16,7 @@
 
 <script setup lang="ts">
 import { PropType, computed, toRaw } from 'vue';
-import {FilterNode, FilterNodeLogical, Schema} from '../../types'
+import {FilterNode, FilterNodeLogical, SchemaField} from '../../types'
 import { BccButton, BccSelect } from '@bcc-code/design-library-vue';
 import { CloseIcon, } from '@bcc-code/icons-vue';
 import Node from './node.vue';
@@ -29,7 +28,7 @@ const props = defineProps({
         required: true
     },
     schema: {
-        type: Object as PropType<Schema>,
+        type: Object as PropType<SchemaField[]>,
         required: true
     }
 })
