@@ -82,7 +82,7 @@ export function getPersonSchema(): SchemaField[] {
     },
     {
       name: "Cellphone verified",
-      key: "cellPhonelVerified",
+      key: "cellPhoneVerified",
       type: "boolean",
     },
     {
