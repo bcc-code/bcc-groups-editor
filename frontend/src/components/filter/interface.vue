@@ -51,7 +51,6 @@ const model = computed<FilterNode>({
 function getNodesFromFilter(filter: Record<string, unknown>, schema: SchemaField[], prefix = ''): FilterNode | undefined {
     const nodes: FilterNode[] = []
 
-
     for(const op of logicalOperators) {
         if (!( op in filter)) {
             continue;
@@ -99,7 +98,7 @@ function getNodesFromFilter(filter: Record<string, unknown>, schema: SchemaField
                 delete filter[op as never]
             }
 
-            const subnode = getNodesFromFilter(fieldFilter, fieldSchema.fields ?? [], field)
+            const subnode = getNodesFromFilter(fieldFilter, fieldSchema.fields ?? [])
             if(!subnode) {
                 continue;
             }
