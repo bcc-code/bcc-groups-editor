@@ -29,7 +29,7 @@ export class Api {
     if (search) {
       const filters: object[] = [
         { name: { _contains: search } },
-        { tags: { _contains: search.split(" ") } },
+        { tags: { _contains: search.split(",").map((t) => t.trim()) } },
       ];
 
       if (isUid(search)) {
