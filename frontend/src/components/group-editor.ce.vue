@@ -7,7 +7,8 @@
 
 <script setup lang="ts">
 import groupsView from './groups-view.vue';
-import groupEdit from './group-edit.vue';import { ref, watchEffect } from 'vue';
+import groupEdit from './group-edit.vue';
+import { ref, watchEffect } from 'vue';
 import { Api, TokenSource, StaticTokenSource, UrlTokenSource } from '../api';
 
 const props = defineProps({
