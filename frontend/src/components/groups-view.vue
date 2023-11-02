@@ -36,7 +36,7 @@
 <script setup lang="ts">
 import { BccBadge, BccButton, BccInput, BccTable } from '@bcc-code/design-library-vue';
 import { AddIcon, SearchIcon } from '@bcc-code/icons-vue';
-import { PropType, onMounted, ref, watchEffect } from 'vue';
+import { PropType, ref, watchEffect } from 'vue';
 import { Column, Direction, Group } from '../types';
 import { Api } from '../api';
 import TableDate from './table-date.vue';
@@ -63,11 +63,6 @@ async function loadGroups() {
     groups.value = await props.api.getGroups(search.value, sortDirection.value, sortBy.value)
 }
 
-onMounted(() => {
-    loadGroups()
-})
-
-
 const sortBy = ref<string>()
 const sortDirection = ref<Direction>('ascending')
 
@@ -92,6 +87,6 @@ watchEffect(() => {
 const emits = defineEmits(['editGroup', 'addGroup'])
 
 function editItem(uid: string) {
-    emits("editGroup", groups.value.find((g) => g.uid == uid))
+    emits("editGroup", uid)
 }
 </script>

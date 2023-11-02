@@ -1,5 +1,5 @@
 <template>
-    <h3 class="text-xl">Group members</h3>
+    <h3 class="text-xl">Group members ({{ totalMembers }})</h3>
     <div class=" w-full flex justify-between mb-4 gap-4">
         <PersonSelect @select="addMember($event.uid)" :api="api" />
         <BccInput
@@ -9,7 +9,7 @@
             class=""
             />
     </div>
-    <BccTable :columns="columns" :items="membersFormatted" :sortBy="sortBy" :sortDirection="sortDirection" @update:sortBy="updateSortBy" @update:sortDirection="updateSortDirection">
+    <BccTable :columns="columns" :items="members" :sortBy="sortBy" :sortDirection="sortDirection" @update:sortBy="updateSortBy" @update:sortDirection="updateSortDirection">
         <template #item.lastChangedDate="{ item }">
             <TableDate :date="item.lastChangedDate"/> 
        </template>
@@ -20,38 +20,28 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, computed, onMounted, ref, watchEffect } from 'vue';
-import { Direction, GroupMember, Column, GroupType } from '../types';
+import { PropType, computed, ref, watchEffect } from 'vue';
+import { Direction, Column, Group, Person } from '../types';
 import { Api } from '../api';
 import { BccButton, BccInput, BccTable } from '@bcc-code/design-library-vue';
 import { SearchIcon } from '@bcc-code/icons-vue';
 import TableDate from './table-date.vue';
 import PersonSelect from './person-select.vue';
 
-type GroupMemberFormatted = {
-    uid: string;
-    personUid: string;
-    personID: string;
-    displayName: string;
-    lastChangedDate: string;
-}
-
 const props = defineProps({
-    groupUid: {type: String, required: true},
-    type: {type: String as PropType<GroupType>, required: true},
+    group: {type: Object as PropType<Group>, required: true},
     api: {type: Object as PropType<Api>, required: true}
 })
 
 const columns = computed(() => {
     const columns = [
-        {text: "Uid", key: "personUid"},
+        {text: "Uid", key: "uid"},
         {text: "Person ID", key: "personID"},
         {text: "Display Name", key: "displayName"},
     ] as Column[]
 
-    if(props.type === 'Static') {
+    if(props.group.type === 'Static') {
         columns.push(
-            {text: "Last Changed", key: "lastChangedDate"},
             {text: "Actions", key: 'actions'}
         )
     }
@@ -59,38 +49,27 @@ const columns = computed(() => {
     return columns
 })
 
-const members = ref<GroupMember[]>([])
 
-const membersFormatted = computed<GroupMemberFormatted[]>(() => {
-    return members.value.map(m => {
-        return {
-            uid: m.uid,
-            personUid: m.person.uid,
-            personID: m.person.personID,
-            displayName: m.person.displayName,
-            lastChangedDate: m.lastChangedDate
-        }
-    })
-})
+const members = ref<Person[]>([])
+const totalMembers = ref(0)
 
 async function loadMembers() {
-    members.value = await props.api.getGroupMembers(props.groupUid, search.value, sortDirection.value, sortBy.value)
+    const res = await props.api.getGroupMembers(props.group, search.value, sortDirection.value, sortBy.value)
+    members.value = res.data
+    totalMembers.value = res.meta.total
+
 }
 
 async function addMember(personUid: string) {
-    await props.api.addGroupMember(props.groupUid, personUid);
+    await props.api.addGroupMember(props.group.uid, personUid);
     await loadMembers()
 }
 
 
-async function removeMember(memberUid: string) {
-    await props.api.removeGroupMember(props.groupUid, memberUid);
+async function removeMember(personUid: string) {
+    await props.api.removeGroupMember(props.group.uid, personUid);
     await loadMembers()
 }
-
-onMounted(() => {
-    loadMembers()
-})
 
 const sortBy = ref<string>()
 const sortDirection = ref<Direction>('ascending')

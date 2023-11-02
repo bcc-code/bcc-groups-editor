@@ -1,6 +1,6 @@
 <template>
-
     <VueMultiselect
+        class="w-48 person-select"
         @update:modelValue="emit('select', $event)"
         :options="persons"
         :searchable="true"
@@ -9,7 +9,11 @@
         @search-change="findPersons"
         placeholder="Add a person"
         label="displayName"
-    />
+    >
+        <template v-slot:option="props">
+            <div class="hover:bg-slate-200">{{ props.option.displayName }}</div>
+        </template>
+    </VueMultiselect>
 </template>
 
 <script setup lang="ts">
@@ -41,3 +45,7 @@ const emit = defineEmits<{
 }>()
 
 </script>
+
+<style>
+
+</style>

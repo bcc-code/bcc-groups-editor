@@ -23,6 +23,15 @@ export type GroupMember = {
   lastChangedDate: string;
 };
 
+export type Wrapped<T> = {
+  data: T;
+  meta: {
+    total: number;
+    limit: number;
+    skipped: number;
+  };
+};
+
 export type Direction = "ascending" | "descending";
 
 export type Column = {

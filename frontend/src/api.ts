@@ -1,4 +1,4 @@
-import { Direction, Group, GroupMember, Person } from "./types";
+import { Direction, Group, GroupMember, Person, Wrapped } from "./types";
 
 export interface TokenSource {
   Token(): Promise<string>;
@@ -39,40 +39,56 @@ export class Api {
       qry.append("filter", JSON.stringify({ _or: filters }));
     }
 
-    return this.makeRequest("GET", `groups?${qry.toString()}`) as Promise<
-      Group[]
-    >;
+    const res = (await this.makeRequest(
+      "GET",
+      `groups?${qry.toString()}`
+    )) as Wrapped<Group[]>;
+
+    return res.data;
+  }
+
+  async getGroup(groupUid: string): Promise<Group> {
+    const res = (await this.makeRequest(
+      "GET",
+      `groups/${groupUid}`
+    )) as Wrapped<Group>;
+    return res.data;
   }
 
   async saveGroup(group: Group): Promise<Group> {
+    let res: Wrapped<Group>;
     if (group.uid) {
-      return this.makeRequest(
+      res = (await this.makeRequest(
         "PUT",
         `/groups/${group.uid}`,
         getGroupForSave(group)
-      ) as Promise<Group>;
+      )) as Wrapped<Group>;
     } else {
-      return this.makeRequest(
+      res = (await this.makeRequest(
         "POST",
         `groups`,
         getGroupForSave(group)
-      ) as Promise<Group>;
+      )) as Wrapped<Group>;
     }
+    return res.data;
   }
 
   async deleteGroup(uid: string): Promise<Group> {
-    return this.makeRequest("DELETE", `groups/${uid}`) as Promise<Group>;
+    const res = (await this.makeRequest(
+      "DELETE",
+      `groups/${uid}`
+    )) as Wrapped<Group>;
+    return res.data;
   }
 
   async getGroupMembers(
-    groupUid: string,
+    group: Group,
     search: string,
     sortDirection: Direction,
     sortBy?: string
-  ): Promise<GroupMember[]> {
+  ): Promise<Wrapped<Person[]>> {
     const qry = new URLSearchParams({
-      fields:
-        "uid,lastChangedDate,person.displayName,person.uid,person.personID",
+      fields: "uid,personID,displayName",
     });
 
     if (sortBy) {
@@ -81,37 +97,49 @@ export class Api {
         `${sortDirection === "descending" ? "-" : ""}${sortBy}`
       );
     }
+    if (group.type === "Dynamic" && group.rule) {
+      qry.append("filter", group.rule);
+    }
+    if (group.type === "Static") {
+      qry.append(
+        "filter",
+        `{"staticGroupMemberships": {"groupUid": {"_eq": "${group.uid}"}}}`
+      );
+    }
     if (search) {
-      const filter = {
-        person: {
-          _or: [
-            { displayName: { _contains: search } },
-            { personID: { _eq: parseInt(search) } },
-          ],
-        },
-      };
-
-      qry.append("filter", JSON.stringify(filter));
+      qry.append("search", search);
     }
 
     const res = (await this.makeRequest(
       "GET",
-      `groups/${groupUid}/members?${qry.toString()}`
-    )) as GroupMember[];
+      `v2/persons?${qry.toString()}`
+    )) as Wrapped<Person[]>;
     return res;
   }
 
   async addGroupMember(groupUid: string, personUid: string) {
-    return this.makeRequest("POST", `groups/${groupUid}/members`, {
+    const res = (await this.makeRequest("POST", `groups/${groupUid}/members`, {
       personUid: personUid,
-    }) as Promise<GroupMember>;
+    })) as Wrapped<GroupMember>;
+    return res.data;
   }
 
-  async removeGroupMember(groupUid: string, memberUid: string) {
-    return this.makeRequest(
+  async removeGroupMember(groupUid: string, personUid: string) {
+    const groupMembership = (await this.makeRequest(
+      "GET",
+      `groups/${groupUid}/members?filter={"personUid": {"_eq": "${personUid}"}}`
+    )) as Wrapped<GroupMember[]>;
+
+    if (groupMembership.data.length < 1) {
+      throw Error("person is not a member");
+    }
+
+    const res = (await this.makeRequest(
       "DELETE",
-      `groups/${groupUid}/members/${memberUid}`
-    ) as Promise<GroupMember>;
+      `groups/${groupUid}/members/${groupMembership.data[0].uid}`
+    )) as Wrapped<GroupMember>;
+
+    return res.data;
   }
 
   async findPersons(search: string): Promise<Person[]> {
@@ -123,9 +151,12 @@ export class Api {
       qry.append("search", search);
     }
 
-    return this.makeRequest("GET", `v2/persons?${qry.toString()}`) as Promise<
-      Person[]
-    >;
+    const res = (await this.makeRequest(
+      "GET",
+      `v2/persons?${qry.toString()}`
+    )) as Wrapped<Person[]>;
+
+    return res.data;
   }
 
   private async makeRequest(
@@ -151,7 +182,7 @@ export class Api {
       throw Error(resJson.error.message);
     }
 
-    return resJson.data;
+    return resJson;
   }
 }
 
