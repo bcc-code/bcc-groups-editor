@@ -11,7 +11,34 @@ export type Group = {
 
 export type GroupType = "Static" | "Dynamic";
 
+export type Person = {
+  uid: string;
+  personID: string;
+  displayName: string;
+};
+
+export type GroupMember = {
+  uid: string;
+  person: Person;
+  lastChangedDate: string;
+};
+
+export type Wrapped<T> = {
+  data: T;
+  meta: {
+    total: number;
+    limit: number;
+    skipped: number;
+  };
+};
+
 export type Direction = "ascending" | "descending";
+
+export type Column = {
+  key: string;
+  text?: string;
+  sortable?: boolean;
+};
 
 export const filterOperators = [
   "_eq",

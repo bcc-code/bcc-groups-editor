@@ -1,16 +1,15 @@
 <template>
     <div v-if="api">
-        <group-edit v-if="editedGroup"  :api="api" :group="editedGroup" @close="editedGroup = null" />
-        <groups-view v-else :api="api" @edit-group="editedGroup = $event" @add-group="editedGroup = getEmptyGroup()"/>
+        <group-edit v-if="editedGroup || addingGroup"  :api="api" :group-uid="editedGroup" @close="stopGroupEdit()" />
+        <groups-view v-else :api="api" @edit-group="editedGroup = $event" @add-group="addingGroup = true"/>
     </div>
 </template>
 
 <script setup lang="ts">
 import groupsView from './groups-view.vue';
 import groupEdit from './group-edit.vue';
-import {Group} from '../types'
 import { ref, watchEffect } from 'vue';
-import { Api, TokenSource, StaticTokenSource, UrlTokenSource, getEmptyGroup } from '../api';
+import { Api, TokenSource, StaticTokenSource, UrlTokenSource } from '../api';
 
 const props = defineProps({
     apiBaseUrl: {type: String, required: true},
@@ -36,11 +35,18 @@ function createApi(): Api {
 
 }
 
-const editedGroup = ref<Group | null>(null)
+const editedGroup = ref<string>()
+const addingGroup = ref(false)
+
+function stopGroupEdit() {
+    editedGroup.value = undefined;
+    addingGroup.value = false;
+}
 </script>
 
 <style>
 @import "@bcc-code/design-library-vue/tailwind/index.css";
+@import "vue-multiselect/dist/vue-multiselect.css";
 
 @tailwind base;
 @tailwind components;

@@ -24,8 +24,8 @@
             </div>
         </template>
         <template #item.lastChangedDate="{ item }">
-            <div :title="item.lastChangedDate">{{ formatDate(item.lastChangedDate) }}</div>
-        </template>
+            <TableDate :date="item.lastChangedDate"/> 
+       </template>
 
         <template #item.actions="{ item }">
             <BccButton variant="tertiary" size="sm" :padding="false" @click="editItem(item.uid)">Edit</BccButton>
@@ -36,15 +36,11 @@
 <script setup lang="ts">
 import { BccBadge, BccButton, BccInput, BccTable } from '@bcc-code/design-library-vue';
 import { AddIcon, SearchIcon } from '@bcc-code/icons-vue';
-import { PropType, onMounted, ref, watchEffect } from 'vue';
-import { Direction, Group } from '../types';
+import { PropType, ref, watchEffect } from 'vue';
+import { Column, Direction, Group } from '../types';
 import { Api } from '../api';
+import TableDate from './table-date.vue';
 
-type Column = {
-    key: string;
-    text?: string;
-    sortable?: boolean;
-};
 const columns = [
     {text: "Uid", key: "uid"},
     {text: "Name", key: "name"},
@@ -67,11 +63,6 @@ async function loadGroups() {
     groups.value = await props.api.getGroups(search.value, sortDirection.value, sortBy.value)
 }
 
-onMounted(() => {
-    loadGroups()
-})
-
-
 const sortBy = ref<string>()
 const sortDirection = ref<Direction>('ascending')
 
@@ -93,14 +84,9 @@ watchEffect(() => {
 })
 
 
-
-function formatDate(isoDate: string) {
-    return new Date(isoDate).toLocaleDateString('en-us', { weekday:"short", year:"numeric", month:"long", day:"numeric"}) 
-}
-
 const emits = defineEmits(['editGroup', 'addGroup'])
 
 function editItem(uid: string) {
-    emits("editGroup", groups.value.find((g) => g.uid == uid))
+    emits("editGroup", uid)
 }
 </script>
