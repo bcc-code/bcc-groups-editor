@@ -27,9 +27,7 @@ const props = defineProps({
     api: {type: Object as PropType<Api>, required: true}
 })
 
-
 const persons = ref<Person[]>([])
-
 
 async function findPersons(s: string) {
     if(!s) {
@@ -38,7 +36,6 @@ async function findPersons(s: string) {
     };
     persons.value = await props.api.findPersons(s)
 }
-
 
 const emit = defineEmits<{
     select: [Person]

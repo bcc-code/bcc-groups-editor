@@ -45,10 +45,8 @@ const columns = computed(() => {
             {text: "Actions", key: 'actions'}
         )
     }
-
     return columns
 })
-
 
 const members = ref<Person[]>([])
 const totalMembers = ref(0)
@@ -57,7 +55,6 @@ async function loadMembers() {
     const res = await props.api.getGroupMembers(props.group, search.value, sortDirection.value, sortBy.value)
     members.value = res.data
     totalMembers.value = res.meta.total
-
 }
 
 async function addMember(personUid: string) {
@@ -90,7 +87,5 @@ watchEffect(() => {
     search;
     loadMembers();
 })
-
-
 
 </script> 
