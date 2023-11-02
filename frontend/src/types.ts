@@ -18,7 +18,9 @@ export type Person = {
 };
 
 export type GroupMember = {
+  uid: string;
   person: Person;
+  lastChangedDate: string;
 };
 
 export type Direction = "ascending" | "descending";

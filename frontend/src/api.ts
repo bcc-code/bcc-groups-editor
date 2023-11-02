@@ -69,9 +69,10 @@ export class Api {
     search: string,
     sortDirection: Direction,
     sortBy?: string
-  ): Promise<Person[]> {
+  ): Promise<GroupMember[]> {
     const qry = new URLSearchParams({
-      fields: "person.displayName,person.uid,person.personID",
+      fields:
+        "uid,lastChangedDate,person.displayName,person.uid,person.personID",
     });
 
     if (sortBy) {
@@ -97,7 +98,20 @@ export class Api {
       "GET",
       `groups/${groupUid}/members?${qry.toString()}`
     )) as GroupMember[];
-    return res.map((m) => m.person);
+    return res;
+  }
+
+  async addGroupMember(groupUid: string, personUid: string) {
+    return this.makeRequest("POST", `groups/${groupUid}/members`, {
+      personUid: personUid,
+    }) as Promise<GroupMember>;
+  }
+
+  async removeGroupMember(groupUid: string, memberUid: string) {
+    return this.makeRequest(
+      "DELETE",
+      `groups/${groupUid}/members/${memberUid}`
+    ) as Promise<GroupMember>;
   }
 
   async findPersons(search: string): Promise<Person[]> {
@@ -109,11 +123,9 @@ export class Api {
       qry.append("search", search);
     }
 
-    const res = (await this.makeRequest(
-      "GET",
-      `persons?${qry.toString()}`
-    )) as GroupMember[];
-    return res.map((m) => m.person);
+    return this.makeRequest("GET", `v2/persons?${qry.toString()}`) as Promise<
+      Person[]
+    >;
   }
 
   private async makeRequest(

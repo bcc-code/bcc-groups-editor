@@ -42,7 +42,7 @@
             </div>
         </div>
         <BccInput disabled v-model="editedGroup.appUid" label="App Uid"/>
-        <GroupMembers v-if="group.uid" :api="api" :group="group"/>
+        <GroupMembers v-if="group.uid" :api="api" :groupUid="group.uid" :type="group.type" :key="groupKey"/>
     </div>
 </template>
 
@@ -72,11 +72,12 @@ const isChanged = computed(() => {
 
 const errorSaving = ref("")
 
+const groupKey = ref(0)
+
 async function saveGroup() {
     try {
-
-        await props.api.saveGroup(editedGroup.value)
-        emit('close')
+        editedGroup.value = await props.api.saveGroup(editedGroup.value)
+        groupKey.value ++;
     } catch(err) {
         if(!(err instanceof Error))
             throw err

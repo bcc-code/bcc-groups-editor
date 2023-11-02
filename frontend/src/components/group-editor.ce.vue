@@ -41,6 +41,7 @@ const editedGroup = ref<Group | null>(null)
 
 <style>
 @import "@bcc-code/design-library-vue/tailwind/index.css";
+@import "vue-multiselect/dist/vue-multiselect.css";
 
 @tailwind base;
 @tailwind components;

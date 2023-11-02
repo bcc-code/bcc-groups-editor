@@ -24,8 +24,8 @@
             </div>
         </template>
         <template #item.lastChangedDate="{ item }">
-            <div :title="item.lastChangedDate">{{ formatDate(item.lastChangedDate) }}</div>
-        </template>
+            <TableDate :date="item.lastChangedDate"/> 
+       </template>
 
         <template #item.actions="{ item }">
             <BccButton variant="tertiary" size="sm" :padding="false" @click="editItem(item.uid)">Edit</BccButton>
@@ -39,6 +39,7 @@ import { AddIcon, SearchIcon } from '@bcc-code/icons-vue';
 import { PropType, onMounted, ref, watchEffect } from 'vue';
 import { Column, Direction, Group } from '../types';
 import { Api } from '../api';
+import TableDate from './table-date.vue';
 
 const columns = [
     {text: "Uid", key: "uid"},
@@ -87,11 +88,6 @@ watchEffect(() => {
     loadGroups();
 })
 
-
-
-function formatDate(isoDate: string) {
-    return new Date(isoDate).toLocaleDateString('en-us', { weekday:"short", year:"numeric", month:"long", day:"numeric"}) 
-}
 
 const emits = defineEmits(['editGroup', 'addGroup'])
 
